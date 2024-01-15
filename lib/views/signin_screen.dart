@@ -191,10 +191,12 @@ class _SignInScreenState extends State<SignInScreen> {
                                     userName: username.text,
                                     userPassword: password.text));
                                 if (response == true) {
-                                  if (provider.isChecked == true) {
-                                    // if check setremmber me becomes true then session true
-                                    provider.setRememberMe();
-                                  }
+                                  //EDITED to make save if whether checked or not
+                                  // if (provider.isChecked == true) {
+                                  // if check setremmber me becomes true then session true
+                                  provider.setRememberMe();
+                                  // }
+
                                   Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(

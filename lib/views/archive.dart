@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/views/create_userPage.dart';
+import 'package:intro_project/views/edit_userPage.dart';
 import 'package:intro_project/views/welcome_screen.dart';
 import 'package:intro_project/sql/sqlite.dart';
 import 'package:provider/provider.dart';
@@ -134,78 +135,88 @@ class _ArchiveState extends State<Archive> {
                                   password.text =
                                       userList[index].userPassword ?? "";
                                 });
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        actions: [
-                                          Row(
-                                            children: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  if (formKey.currentState!
-                                                      .validate()) {
-                                                    db
-                                                        .updateUser(
-                                                      username.text,
-                                                      password.text,
-                                                      userList[index].userId,
-                                                    )
-                                                        .whenComplete(() {
-                                                      _refresh();
-                                                      Navigator.pop(context);
-                                                    });
-                                                  }
-                                                },
-                                                child: const Text("Update"),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text("Cancel"),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                        title: const Text("Update User"),
-                                        content: Form(
-                                          key: formKey,
-                                          child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                TextFormField(
-                                                  controller: username,
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return "Username is required";
-                                                    }
-                                                    return null;
-                                                  },
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    label: Text("Username"),
-                                                  ),
-                                                ),
-                                                TextFormField(
-                                                  controller: password,
-                                                  validator: (value) {
-                                                    if (value == null ||
-                                                        value.isEmpty) {
-                                                      return "Password is required";
-                                                    }
-                                                    return null;
-                                                  },
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    label: Text("Password"),
-                                                  ),
-                                                ),
-                                              ]),
-                                        ),
-                                      );
-                                    });
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditUser(user: userList[index]),
+                                  ),
+                                ).then((result) {
+                                  _refresh();
+                                });
+
+                                // showDialog(
+                                //     context: context,
+                                //     builder: (context) {
+                                //       return AlertDialog(
+                                //         actions: [
+                                //           Row(
+                                //             children: [
+                                //               TextButton(
+                                //                 onPressed: () {
+                                //                   if (formKey.currentState!
+                                //                       .validate()) {
+                                //                     db
+                                //                         .updateUser(
+                                //                       username.text,
+                                //                       password.text,
+                                //                       userList[index].userId,
+                                //                     )
+                                //                         .whenComplete(() {
+                                //                       _refresh();
+                                //                       Navigator.pop(context);
+                                //                     });
+                                //                   }
+                                //                 },
+                                //                 child: const Text("Update"),
+                                //               ),
+                                //               TextButton(
+                                //                 onPressed: () {
+                                //                   Navigator.pop(context);
+                                //                 },
+                                //                 child: const Text("Cancel"),
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ],
+                                //         title: const Text("Update User"),
+                                //         content: Form(
+                                //           key: formKey,
+                                //           child: Column(
+                                //               mainAxisSize: MainAxisSize.min,
+                                //               children: [
+                                //                 TextFormField(
+                                //                   controller: username,
+                                //                   validator: (value) {
+                                //                     if (value == null ||
+                                //                         value.isEmpty) {
+                                //                       return "Username is required";
+                                //                     }
+                                //                     return null;
+                                //                   },
+                                //                   decoration:
+                                //                       const InputDecoration(
+                                //                     label: Text("Username"),
+                                //                   ),
+                                //                 ),
+                                //                 TextFormField(
+                                //                   controller: password,
+                                //                   validator: (value) {
+                                //                     if (value == null ||
+                                //                         value.isEmpty) {
+                                //                       return "Password is required";
+                                //                     }
+                                //                     return null;
+                                //                   },
+                                //                   decoration:
+                                //                       const InputDecoration(
+                                //                     label: Text("Password"),
+                                //                   ),
+                                //                 ),
+                                //               ]),
+                                //         ),
+                                //       );
+                                //     });
                               },
                               child: Card(
                                 elevation: 5,

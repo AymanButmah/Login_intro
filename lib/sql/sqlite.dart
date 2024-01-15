@@ -48,6 +48,19 @@ class DatabaseHelper {
     return result.map((e) => User.fromJson(e)).toList();
   }
 
+  // get the last user
+  Future<User> getLastUser() async {
+    final Database db = await initDB();
+    List<Map<String, Object?>> result =
+        await db.query('users', orderBy: 'id DESC', limit: 1);
+
+    if (result.isEmpty) {
+      throw Exception("No users found");
+    }
+
+    return User.fromJson(result.first);
+  }
+
   //filter
   Future<List<User>> searchUser(String inputKey) async {
     final Database db = await initDB();
