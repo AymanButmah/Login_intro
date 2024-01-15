@@ -27,27 +27,27 @@ class _ArchiveState extends State<Archive> {
   @override
   void initState() {
     handler = DatabaseHelper();
-    users = handler.getUsers();
+    handler.getUsers();
 
-    handler.initDB().whenComplete(() {
-      users = getAllUsers();
-    });
+    // handler.initDB().whenComplete(() {
+    //   users = getAllUsers();
+    // });
     super.initState();
   }
 
   Future<List<User>> getAllUsers() {
-    return handler.getUsers();
+    return handler.userStream.last;
   }
 
   Future<List<User>> searchUser() {
     return handler.searchUser(inputKey.text);
   }
 
-  Future<void> _refresh() async {
-    setState(() {
-      users = getAllUsers();
-    });
-  }
+  // Future<void> _refresh() async {
+  //   setState(() {
+  //     users = getAllUsers();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +77,9 @@ class _ArchiveState extends State<Archive> {
           Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const CreateUser()))
               .then((value) {
-            if (value) {
-              _refresh();
-            }
+            // if (value) {
+            //   _refresh();
+            // }
           });
         },
         child: const Icon(Icons.add),
@@ -112,11 +112,11 @@ class _ArchiveState extends State<Archive> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<User>>(
-              future: users,
+            child: StreamBuilder<List<User>>(
+              stream: handler.userStream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
@@ -129,12 +129,12 @@ class _ArchiveState extends State<Archive> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  username.text =
-                                      userList[index].userName ?? "";
-                                  password.text =
-                                      userList[index].userPassword ?? "";
-                                });
+                                // setState(() {
+                                //   username.text =
+                                //       userList[index].userName ?? "";
+                                //   password.text =
+                                //       userList[index].userPassword ?? "";
+                                // });
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -142,7 +142,7 @@ class _ArchiveState extends State<Archive> {
                                         EditUser(user: userList[index]),
                                   ),
                                 ).then((result) {
-                                  _refresh();
+                                  // _refresh();
                                 });
 
                                 // showDialog(
@@ -236,7 +236,7 @@ class _ArchiveState extends State<Archive> {
                                       db
                                           .deleteUser(userList[index].userId!)
                                           .whenComplete(() {
-                                        _refresh();
+                                        // _refresh();
                                       });
                                     },
                                   ),
