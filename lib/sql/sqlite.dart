@@ -48,6 +48,18 @@ class DatabaseHelper {
     return result.map((e) => User.fromJson(e)).toList();
   }
 
+  Stream<List<User>> listenAllUsers() async* {
+    final Database db = await initDB();
+    yield* db
+        .query('users', orderBy: 'userId')
+        .asStream()
+        .map((List<Map<String, dynamic>> rows) {
+      return rows
+          .map((Map<String, dynamic> row) => User.fromJson(row))
+          .toList();
+    });
+  }
+
   // get the last user
   Future<User> getLastUser() async {
     final Database db = await initDB();
@@ -72,6 +84,7 @@ class DatabaseHelper {
   //Create User
   Future<int> createUser(User user) async {
     final Database db = await initDB();
+
     return db.insert('users', user.toJson());
   }
 

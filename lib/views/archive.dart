@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
@@ -43,10 +45,12 @@ class _ArchiveState extends State<Archive> {
     return handler.searchUser(inputKey.text);
   }
 
-  Future<void> _refresh() async {
-    setState(() {
-      users = getAllUsers();
-    });
+  void _deleteData(int id) async {
+    await handler.deleteUser(id);
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colors.red,
+        content: Text("User Deleted Successfully!")));
   }
 
   @override
@@ -78,7 +82,7 @@ class _ArchiveState extends State<Archive> {
                   MaterialPageRoute(builder: (context) => const CreateUser()))
               .then((value) {
             if (value) {
-              _refresh();
+              // _refresh();
             }
           });
         },
@@ -112,8 +116,8 @@ class _ArchiveState extends State<Archive> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<User>>(
-              future: users,
+            child: StreamBuilder<List<User>>(
+              stream: DatabaseHelper().listenAllUsers(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -129,21 +133,13 @@ class _ArchiveState extends State<Archive> {
                           itemBuilder: (context, index) {
                             return GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  username.text =
-                                      userList[index].userName ?? "";
-                                  password.text =
-                                      userList[index].userPassword ?? "";
-                                });
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         EditUser(user: userList[index]),
                                   ),
-                                ).then((result) {
-                                  _refresh();
-                                });
+                                );
 
                                 // showDialog(
                                 //     context: context,
@@ -233,11 +229,8 @@ class _ArchiveState extends State<Archive> {
                                   trailing: IconButton(
                                     icon: const Icon(Icons.delete),
                                     onPressed: () {
-                                      db
-                                          .deleteUser(userList[index].userId!)
-                                          .whenComplete(() {
-                                        _refresh();
-                                      });
+                                      // db.deleteUser(userList[index].userId!);
+                                      _deleteData(userList[index].userId ?? 0);
                                     },
                                   ),
                                 ),
