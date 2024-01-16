@@ -29,16 +29,16 @@ class _ArchiveState extends State<Archive> {
   @override
   void initState() {
     handler = DatabaseHelper();
-    users = handler.getUsers();
+    handler.getUsers();
 
-    handler.initDB().whenComplete(() {
-      users = getAllUsers();
-    });
+    // handler.initDB().whenComplete(() {
+    //   users = getAllUsers();
+    // });
     super.initState();
   }
 
   Future<List<User>> getAllUsers() {
-    return handler.getUsers();
+    return handler.userStream.last;
   }
 
   Future<List<User>> searchUser() {
@@ -120,7 +120,7 @@ class _ArchiveState extends State<Archive> {
               stream: DatabaseHelper().listenAllUsers(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {

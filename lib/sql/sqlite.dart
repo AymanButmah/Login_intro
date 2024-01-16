@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:intro_project/models/user.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -7,6 +9,9 @@ class DatabaseHelper {
 
   String users =
       "create table users (userId INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT UNIQUE, userPassword TEXT)";
+
+  final _userController = StreamController<List<User>>.broadcast();
+  Stream<List<User>> get userStream => _userController.stream;
 
   Future<Database> initDB() async {
     final databasePath = await getDatabasesPath();
@@ -42,10 +47,25 @@ class DatabaseHelper {
   }
 
   //get All users
-  Future<List<User>> getUsers() async {
+  Future<void> getUsers() async {
+    print("Kiser");
     final Database db = await initDB();
     List<Map<String, Object?>> result = await db.query('users');
-    return result.map((e) => User.fromJson(e)).toList();
+    // return result.map((e) => User.fromJson(e)).toList();
+    final userList = result.map((userMap) => User.fromJson(userMap)).toList();
+    _userController.add(userList);
+  }
+
+  Stream<List<User>> listenAllUsers() async* {
+    final Database db = await initDB();
+    yield* db
+        .query('users', orderBy: 'userId')
+        .asStream()
+        .map((List<Map<String, dynamic>> rows) {
+      return rows
+          .map((Map<String, dynamic> row) => User.fromJson(row))
+          .toList();
+    });
   }
 
   Stream<List<User>> listenAllUsers() async* {
@@ -82,7 +102,7 @@ class DatabaseHelper {
   }
 
   //Create User
-  Future<int> createUser(User user) async {
+  Future<void> createUser(User user) async {
     final Database db = await initDB();
 
     return db.insert('users', user.toJson());
