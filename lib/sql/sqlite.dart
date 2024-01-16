@@ -10,9 +10,6 @@ class DatabaseHelper {
   String users =
       "create table users (userId INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT UNIQUE, userPassword TEXT)";
 
-  final _userController = StreamController<List<User>>.broadcast();
-  Stream<List<User>> get userStream => _userController.stream;
-
   Future<Database> initDB() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, databaseName);
@@ -47,13 +44,11 @@ class DatabaseHelper {
   }
 
   //get All users
-  Future<void> getUsers() async {
+  Future<List<User>> getUsers() async {
     print("Kiser");
     final Database db = await initDB();
     List<Map<String, Object?>> result = await db.query('users');
-    // return result.map((e) => User.fromJson(e)).toList();
-    final userList = result.map((userMap) => User.fromJson(userMap)).toList();
-    _userController.add(userList);
+    return result.map((e) => User.fromJson(e)).toList();
   }
 
   Stream<List<User>> listenAllUsers() async* {

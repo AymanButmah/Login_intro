@@ -29,16 +29,16 @@ class _ArchiveState extends State<Archive> {
   @override
   void initState() {
     handler = DatabaseHelper();
-    handler.getUsers();
+    users = handler.getUsers();
 
-    // handler.initDB().whenComplete(() {
-    //   users = getAllUsers();
-    // });
+    handler.initDB().whenComplete(() {
+      users = getAllUsers();
+    });
     super.initState();
   }
 
   Future<List<User>> getAllUsers() {
-    return handler.userStream.last;
+    return handler.getUsers();
   }
 
   Future<List<User>> searchUser() {
@@ -47,7 +47,6 @@ class _ArchiveState extends State<Archive> {
 
   void _deleteData(int id) async {
     await handler.deleteUser(id);
-    setState(() {});
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colors.red,
         content: Text("User Deleted Successfully!")));
@@ -100,6 +99,7 @@ class _ArchiveState extends State<Archive> {
               controller: inputKey,
               onChanged: (value) {
                 if (value.isNotEmpty) {
+                  print("Search");
                   setState(() {
                     users = searchUser();
                   });
