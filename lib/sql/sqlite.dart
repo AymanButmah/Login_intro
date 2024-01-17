@@ -1,21 +1,37 @@
 import 'dart:async';
 
+import 'package:get/get.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   final databaseName = "users.db";
-
+  Database? db;
+  bool initialise = false;
   String users =
       "create table users (userId INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT UNIQUE, userPassword TEXT)";
 
+  late Stream<List<User>> userStream;
+
+  RxList filteredData = [].obs;
+  List<User> userData = [];
+
   Future<Database> initDB() async {
+    if (initialise) {
+      return db!;
+    }
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, databaseName);
-    return openDatabase(path, version: 1, onCreate: (db, version) async {
+    db = await openDatabase(path, version: 1, onCreate: (db, version) async {
       await db.execute(users);
     });
+    return db!;
+  }
+
+  init() async {
+    db = await initDB();
+    initialise = true;
   }
 
   Future<bool> login(User user) async {
@@ -48,19 +64,14 @@ class DatabaseHelper {
     print("Kiser");
     final Database db = await initDB();
     List<Map<String, Object?>> result = await db.query('users');
-    return result.map((e) => User.fromJson(e)).toList();
+    print(result);
+    userData = result.map((e) => User.fromJson(e)).toList();
+    filteredData.value = userData;
+    return userData;
   }
 
-  Stream<List<User>> listenAllUsers() async* {
-    final Database db = await initDB();
-    yield* db
-        .query('users', orderBy: 'userId')
-        .asStream()
-        .map((List<Map<String, dynamic>> rows) {
-      return rows
-          .map((Map<String, dynamic> row) => User.fromJson(row))
-          .toList();
-    });
+  Stream<List<Map<String, Object?>>> listenAllUsers() {
+    return db!.query('users', orderBy: 'userId').asStream();
   }
 
   // get the last user
@@ -78,31 +89,32 @@ class DatabaseHelper {
 
   //filter
   Future<List<User>> searchUser(String keyword) async {
-    final Database db = await initDB();
-    List<Map<String, Object?>> result = await db.rawQuery(
-        "select * from users where userName LIKE ? OR userId LIKE ?",
-        ["%$keyword%", "%$keyword%"]);
+    List<Map<String, Object?>> result = await db!
+        .rawQuery("select * from users where userName LIKE ?", ["%$keyword%"]);
     return result.map((e) => User.fromJson(e)).toList();
   }
 
   //Create User
-  Future<Future<int>> createUser(User user) async {
-    final Database db = await initDB();
-
-    return db.insert('users', user.toJson());
+  Future<int> createUser(User user) async {
+    var result = await db!.insert('users', user.toJson());
+    getUsers();
+    return result;
   }
 
   //Update User
   Future<int> updateUser(userName, userPassword, userId) async {
-    final Database db = await initDB();
-    return db.rawUpdate(
+    var result = await db!.rawUpdate(
         'update users set userName = ?, userPassword = ? where userId = ?',
         [userName, userPassword, userId]);
+    getUsers();
+    return result;
   }
 
   //Delete User
   Future<int> deleteUser(int userId) async {
-    final Database db = await initDB();
-    return db.delete('users', where: 'userId = ?', whereArgs: [userId]);
+    var result =
+        await db!.delete('users', where: 'userId = ?', whereArgs: [userId]);
+    getUsers();
+    return result;
   }
 }

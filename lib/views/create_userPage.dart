@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/sql/sqlite.dart';
 
@@ -16,7 +17,7 @@ class _CreateUserState extends State<CreateUser> {
   final password = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  final db = DatabaseHelper();
+  final db = Get.find<DatabaseHelper>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

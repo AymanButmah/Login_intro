@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, must_be_immutable
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/sql/sqlite.dart';
 
@@ -17,7 +18,7 @@ class _EditUserState extends State<EditUser> {
   final password = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  final db = DatabaseHelper();
+  final db = Get.find<DatabaseHelper>();
 
   @override
   void initState() {

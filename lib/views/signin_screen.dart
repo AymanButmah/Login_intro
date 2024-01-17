@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
@@ -24,7 +25,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final password = TextEditingController();
   bool isVisible = false;
   bool isLoginTrue = false;
-  final db = DatabaseHelper();
+  final db = Get.find<DatabaseHelper>();
 
   @override
   Widget build(BuildContext context) {

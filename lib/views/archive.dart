@@ -1,6 +1,7 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, invalid_use_of_protected_member
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/views/create_userPage.dart';
@@ -17,10 +18,14 @@ class Archive extends StatefulWidget {
 }
 
 class _ArchiveState extends State<Archive> {
-  late DatabaseHelper handler;
+  // late DatabaseHelper handler;
+
   late Stream<List<User>> usersStream;
-  final db = DatabaseHelper();
+  final db = Get.find<DatabaseHelper>();
   final formKey = GlobalKey<FormState>();
+
+  RxList get filteredData => Get.find<DatabaseHelper>().filteredData;
+  List get userData => Get.find<DatabaseHelper>().userData;
 
   final username = TextEditingController();
   final password = TextEditingController();
@@ -28,35 +33,34 @@ class _ArchiveState extends State<Archive> {
 
   @override
   void initState() {
-    handler = DatabaseHelper();
-    usersStream = handler.listenAllUsers();
+    chadMethod();
 
-    handler.initDB().whenComplete(() {
-      usersStream = handler.listenAllUsers();
-    });
     super.initState();
   }
 
-  Future<List<User>> getAllUsers() {
-    return handler.getUsers();
+  chadMethod() async {
+    await Get.find<DatabaseHelper>().init();
+
+    // Get.find<DatabaseHelper>().listenAllUsers().listen((event) {
+    //   userData = event.map((e) => User.fromJson(e)).toList();
+    // });
+    await Get.find<DatabaseHelper>().getUsers();
+    filteredData.value = userData;
   }
 
-  Stream<List<User>> searchUser() {
-    return handler.listenAllUsers().map((allUsers) {
-      return allUsers
-          .where((user) => user.userName!
-              .toLowerCase()
-              .contains(inputKey.text.toLowerCase()))
-          .toList();
-    });
+  Future<List<User>> getAllUsers() {
+    return Get.find<DatabaseHelper>().getUsers();
+  }
+
+  void searchUser() {
+    filteredData.value = userData
+        .where((user) =>
+            user.userName!.toLowerCase().contains(inputKey.text.toLowerCase()))
+        .toList();
   }
 
   void _deleteData(int id) async {
-    await handler.deleteUser(id);
-
-    setState(() {
-      usersStream = handler.listenAllUsers();
-    });
+    await Get.find<DatabaseHelper>().deleteUser(id);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -109,13 +113,10 @@ class _ArchiveState extends State<Archive> {
               onChanged: (value) {
                 if (value.isNotEmpty) {
                   print("Search");
-                  setState(() {
-                    usersStream = searchUser();
-                  });
+
+                  searchUser();
                 } else {
-                  setState(() {
-                    usersStream = handler.listenAllUsers();
-                  });
+                  filteredData.value = userData;
                 }
               },
               decoration: const InputDecoration(
@@ -125,58 +126,58 @@ class _ArchiveState extends State<Archive> {
             ),
           ),
           Expanded(
-            child: StreamBuilder<List<User>>(
-              stream: DatabaseHelper().listenAllUsers(),
-              // future: users,listenAllUsers
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  final userList = snapshot.data ?? <User>[];
-
-                  return userList.isEmpty
-                      ? const Center(child: Text('No users available'))
-                      : ListView.builder(
-                          itemCount: userList.length,
-                          itemBuilder: (context, index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditUser(user: userList[index]),
+            child: Obx(
+              () => filteredData.value.isEmpty
+                  ? const Center(child: Text('No users available'))
+                  : Builder(
+                      // future: users,listenAllUsers
+                      //userStream
+                      builder: (context) {
+                        return Obx(
+                          () => ListView.builder(
+                            itemCount: filteredData.value.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditUser(
+                                          user: filteredData.value[index]),
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  elevation: 5,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 5),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
                                   ),
-                                );
-                              },
-                              child: Card(
-                                elevation: 5,
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                      userList[index].userId?.toString() ?? ""),
-                                  subtitle:
-                                      Text(userList[index].userName ?? ""),
-                                  trailing: IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () {
-                                      // db.deleteUser(userList[index].userId!);
-                                      _deleteData(userList[index].userId ?? 0);
-                                    },
+                                  child: ListTile(
+                                    title: Text(filteredData.value[index].userId
+                                            ?.toString() ??
+                                        ""),
+                                    subtitle: Text(
+                                        filteredData.value[index].userName ??
+                                            ""),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.delete),
+                                      onPressed: () {
+                                        // db.deleteUser(userList[index].userId!);
+                                        _deleteData(
+                                            filteredData.value[index].userId ??
+                                                0);
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         );
-                }
-              },
+                      },
+                    ),
             ),
           ),
           Consumer<SessionProvider>(
