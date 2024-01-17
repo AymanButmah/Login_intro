@@ -77,11 +77,12 @@ class DatabaseHelper {
   }
 
   //filter
-  Future<List<User>> searchUser(String inputKey) async {
+  Future<List<User>> searchUser(String keyword) async {
     final Database db = await initDB();
-    List<Map<String, Object?>> searchResult = await db
-        .rawQuery("select * from users where userName LIKE ?", ["%$inputKey%"]);
-    return searchResult.map((e) => User.fromJson(e)).toList();
+    List<Map<String, Object?>> result = await db.rawQuery(
+        "select * from users where userName LIKE ? OR userId LIKE ?",
+        ["%$keyword%", "%$keyword%"]);
+    return result.map((e) => User.fromJson(e)).toList();
   }
 
   //Create User

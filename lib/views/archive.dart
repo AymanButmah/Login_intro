@@ -18,7 +18,7 @@ class Archive extends StatefulWidget {
 
 class _ArchiveState extends State<Archive> {
   late DatabaseHelper handler;
-  late Future<List<User>> users;
+  late Stream<List<User>> usersStream;
   final db = DatabaseHelper();
   final formKey = GlobalKey<FormState>();
 
@@ -29,10 +29,10 @@ class _ArchiveState extends State<Archive> {
   @override
   void initState() {
     handler = DatabaseHelper();
-    users = handler.getUsers();
+    usersStream = handler.listenAllUsers();
 
     handler.initDB().whenComplete(() {
-      users = getAllUsers();
+      usersStream = handler.listenAllUsers();
     });
     super.initState();
   }
@@ -41,15 +41,29 @@ class _ArchiveState extends State<Archive> {
     return handler.getUsers();
   }
 
-  Future<List<User>> searchUser() {
-    return handler.searchUser(inputKey.text);
+  Stream<List<User>> searchUser() {
+    return handler.listenAllUsers().map((allUsers) {
+      return allUsers
+          .where((user) => user.userName!
+              .toLowerCase()
+              .contains(inputKey.text.toLowerCase()))
+          .toList();
+    });
   }
 
   void _deleteData(int id) async {
     await handler.deleteUser(id);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+
+    setState(() {
+      usersStream = handler.listenAllUsers();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
         backgroundColor: Colors.red,
-        content: Text("User Deleted Successfully!")));
+        content: Text("User Deleted Successfully!"),
+      ),
+    );
   }
 
   @override
@@ -78,12 +92,7 @@ class _ArchiveState extends State<Archive> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const CreateUser()))
-              .then((value) {
-            if (value) {
-              // _refresh();
-            }
-          });
+              MaterialPageRoute(builder: (context) => const CreateUser()));
         },
         child: const Icon(Icons.add),
       ),
@@ -101,11 +110,11 @@ class _ArchiveState extends State<Archive> {
                 if (value.isNotEmpty) {
                   print("Search");
                   setState(() {
-                    users = searchUser();
+                    usersStream = searchUser();
                   });
                 } else {
                   setState(() {
-                    users = getAllUsers();
+                    usersStream = handler.listenAllUsers();
                   });
                 }
               },
@@ -118,6 +127,7 @@ class _ArchiveState extends State<Archive> {
           Expanded(
             child: StreamBuilder<List<User>>(
               stream: DatabaseHelper().listenAllUsers(),
+              // future: users,listenAllUsers
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -140,79 +150,6 @@ class _ArchiveState extends State<Archive> {
                                         EditUser(user: userList[index]),
                                   ),
                                 );
-
-                                // showDialog(
-                                //     context: context,
-                                //     builder: (context) {
-                                //       return AlertDialog(
-                                //         actions: [
-                                //           Row(
-                                //             children: [
-                                //               TextButton(
-                                //                 onPressed: () {
-                                //                   if (formKey.currentState!
-                                //                       .validate()) {
-                                //                     db
-                                //                         .updateUser(
-                                //                       username.text,
-                                //                       password.text,
-                                //                       userList[index].userId,
-                                //                     )
-                                //                         .whenComplete(() {
-                                //                       _refresh();
-                                //                       Navigator.pop(context);
-                                //                     });
-                                //                   }
-                                //                 },
-                                //                 child: const Text("Update"),
-                                //               ),
-                                //               TextButton(
-                                //                 onPressed: () {
-                                //                   Navigator.pop(context);
-                                //                 },
-                                //                 child: const Text("Cancel"),
-                                //               ),
-                                //             ],
-                                //           ),
-                                //         ],
-                                //         title: const Text("Update User"),
-                                //         content: Form(
-                                //           key: formKey,
-                                //           child: Column(
-                                //               mainAxisSize: MainAxisSize.min,
-                                //               children: [
-                                //                 TextFormField(
-                                //                   controller: username,
-                                //                   validator: (value) {
-                                //                     if (value == null ||
-                                //                         value.isEmpty) {
-                                //                       return "Username is required";
-                                //                     }
-                                //                     return null;
-                                //                   },
-                                //                   decoration:
-                                //                       const InputDecoration(
-                                //                     label: Text("Username"),
-                                //                   ),
-                                //                 ),
-                                //                 TextFormField(
-                                //                   controller: password,
-                                //                   validator: (value) {
-                                //                     if (value == null ||
-                                //                         value.isEmpty) {
-                                //                       return "Password is required";
-                                //                     }
-                                //                     return null;
-                                //                   },
-                                //                   decoration:
-                                //                       const InputDecoration(
-                                //                     label: Text("Password"),
-                                //                   ),
-                                //                 ),
-                                //               ]),
-                                //         ),
-                                //       );
-                                //     });
                               },
                               child: Card(
                                 elevation: 5,
@@ -272,16 +209,4 @@ class _ArchiveState extends State<Archive> {
       ),
     );
   }
-
-  // bool validate() {
-  //   if (username.text.isEmpty) {
-  //     return false;
-  //   }
-
-  //   if (password.text.isEmpty) {
-  //     return false;
-  //   }
-
-  //   return true;
-  // }
 }
