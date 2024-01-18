@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/views/create_userPage.dart';
 import 'package:intro_project/views/edit_userPage.dart';
@@ -18,9 +17,6 @@ class Archive extends StatefulWidget {
 }
 
 class _ArchiveState extends State<Archive> {
-  // late DatabaseHelper handler;
-
-  late Stream<List<User>> usersStream;
   final db = Get.find<DatabaseHelper>();
   final formKey = GlobalKey<FormState>();
 
@@ -34,24 +30,16 @@ class _ArchiveState extends State<Archive> {
   @override
   void initState() {
     chadMethod();
-
     super.initState();
   }
 
   chadMethod() async {
     await Get.find<DatabaseHelper>().init();
-
-    // Get.find<DatabaseHelper>().listenAllUsers().listen((event) {
-    //   userData = event.map((e) => User.fromJson(e)).toList();
-    // });
     await Get.find<DatabaseHelper>().getUsers();
     filteredData.value = userData;
   }
 
-  Future<List<User>> getAllUsers() {
-    return Get.find<DatabaseHelper>().getUsers();
-  }
-
+  //filter
   void searchUser() {
     filteredData.value = userData
         .where((user) =>
@@ -61,7 +49,6 @@ class _ArchiveState extends State<Archive> {
 
   void _deleteData(int id) async {
     await Get.find<DatabaseHelper>().deleteUser(id);
-
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         backgroundColor: Colors.red,
@@ -88,7 +75,10 @@ class _ArchiveState extends State<Archive> {
                             builder: (context) => const WelcomeScreen()));
                   },
                   icon: const Icon(Icons.arrow_back_rounded)),
-              const Text("User List"),
+              const Text(
+                "User List",
+                style: TextStyle(color: Colors.blue),
+              ),
             ],
           ),
         ),
@@ -113,7 +103,6 @@ class _ArchiveState extends State<Archive> {
               onChanged: (value) {
                 if (value.isNotEmpty) {
                   print("Search");
-
                   searchUser();
                 } else {
                   filteredData.value = userData;
@@ -130,8 +119,6 @@ class _ArchiveState extends State<Archive> {
               () => filteredData.value.isEmpty
                   ? const Center(child: Text('No users available'))
                   : Builder(
-                      // future: users,listenAllUsers
-                      //userStream
                       builder: (context) {
                         return Obx(
                           () => ListView.builder(
@@ -155,14 +142,16 @@ class _ArchiveState extends State<Archive> {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: ListTile(
-                                    title: Text(filteredData.value[index].userId
-                                            ?.toString() ??
-                                        ""),
+                                    title: Text(
+                                      "User ID: ${filteredData.value[index].userId?.toString() ?? ""}",
+                                      style:
+                                          const TextStyle(color: Colors.blue),
+                                    ),
                                     subtitle: Text(
-                                        filteredData.value[index].userName ??
-                                            ""),
+                                        "Name: ${filteredData.value[index].userName ?? ""} "),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.delete),
+                                      color: Colors.red,
                                       onPressed: () {
                                         // db.deleteUser(userList[index].userId!);
                                         _deleteData(
@@ -194,7 +183,7 @@ class _ArchiveState extends State<Archive> {
                       MaterialStateProperty.all<Color>(Colors.white),
                   elevation: MaterialStateProperty.all<double>(5.0),
                   padding: MaterialStateProperty.all<EdgeInsets>(
-                    const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   ),
                   shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                     RoundedRectangleBorder(

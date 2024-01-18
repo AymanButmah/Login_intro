@@ -31,10 +31,17 @@ class _EditUserState extends State<EditUser> {
   }
 
   @override
+  void dispose() {
+    username.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit User"),
+        title: const Text("Edit User", style: TextStyle(color: Colors.blue)),
         actions: [
           IconButton(
               onPressed: () {
@@ -60,6 +67,7 @@ class _EditUserState extends State<EditUser> {
             child: Column(
               children: [
                 TextFormField(
+                  autofocus: true,
                   controller: username,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -70,6 +78,9 @@ class _EditUserState extends State<EditUser> {
                   decoration: const InputDecoration(
                     label: Text("Username"),
                   ),
+                  onEditingComplete: () {
+                    FocusScope.of(context).nextFocus();
+                  },
                 ),
                 TextFormField(
                   controller: password,
@@ -82,10 +93,43 @@ class _EditUserState extends State<EditUser> {
                   decoration: const InputDecoration(
                     label: Text("Password"),
                   ),
+                  onEditingComplete: () {
+                    _submitForm();
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _submitForm();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text("Update User"),
                 ),
               ],
             ),
           )),
     );
+  }
+
+  void _submitForm() {
+    if (formKey.currentState!.validate()) {
+      db
+          .updateUser(
+        username.text,
+        password.text,
+        widget.user.userId,
+      )
+          .whenComplete(() {
+        Navigator.pop(context);
+      });
+    }
   }
 }

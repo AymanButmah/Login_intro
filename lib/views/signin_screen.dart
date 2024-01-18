@@ -26,6 +26,35 @@ class _SignInScreenState extends State<SignInScreen> {
   bool isVisible = false;
   bool isLoginTrue = false;
   final db = Get.find<DatabaseHelper>();
+  @override
+  void dispose() {
+    username.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  void _submitForm() async {
+    if (_formSignInKey.currentState!.validate()) {
+      var response = await db.login(User(
+        userName: username.text,
+        userPassword: password.text,
+      ));
+
+      if (response == true) {
+        // if check setremmber me becomes true then session true
+        Provider.of<SessionProvider>(context, listen: false).setRememberMe();
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Archive()),
+        );
+      } else {
+        setState(() {
+          isLoginTrue = true;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +96,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         height: 40.0,
                       ),
                       TextFormField(
+                        autofocus: true,
                         controller: username,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -93,6 +123,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        onEditingComplete: () {
+                          FocusScope.of(context).nextFocus();
+                        },
                       ),
                       const SizedBox(
                         height: 25.0,
@@ -135,6 +168,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                   ? Icons.visibility
                                   : Icons.visibility_off)),
                         ),
+                        onEditingComplete: () {
+                          _submitForm();
+                        },
                       ),
                       isLoginTrue
                           ? const Text(
@@ -186,30 +222,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         child: Consumer<SessionProvider>(builder:
                             (context, SessionProvider provider, child) {
                           return ElevatedButton(
-                            onPressed: () async {
-                              if (_formSignInKey.currentState!.validate()) {
-                                var response = await db.login(User(
-                                    userName: username.text,
-                                    userPassword: password.text));
-                                if (response == true) {
-                                  //EDITED to make save if whether checked or not
-                                  // if (provider.isChecked == true) {
-                                  // if check setremmber me becomes true then session true
-                                  provider.setRememberMe();
-                                  // }
-
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const Archive()));
-                                } else {
-                                  setState(() {
-                                    isLoginTrue = true;
-                                  });
-                                }
-                              }
-                            },
+                            onPressed: _submitForm,
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(
                                 const Color(0xFF416FDF),

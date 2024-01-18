@@ -12,8 +12,6 @@ class DatabaseHelper {
   String users =
       "create table users (userId INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT UNIQUE, userPassword TEXT)";
 
-  late Stream<List<User>> userStream;
-
   RxList filteredData = [].obs;
   List<User> userData = [];
 
@@ -45,7 +43,7 @@ class DatabaseHelper {
     }
   }
 
-  //Sign up / add User
+  //Sign up
   Future<int> signup(User user) async {
     final Database db = await initDB();
     return db.insert('users', user.toJson());
@@ -68,30 +66,6 @@ class DatabaseHelper {
     userData = result.map((e) => User.fromJson(e)).toList();
     filteredData.value = userData;
     return userData;
-  }
-
-  Stream<List<Map<String, Object?>>> listenAllUsers() {
-    return db!.query('users', orderBy: 'userId').asStream();
-  }
-
-  // get the last user
-  Future<User> getLastUser() async {
-    final Database db = await initDB();
-    List<Map<String, Object?>> result =
-        await db.query('users', orderBy: 'id DESC', limit: 1);
-
-    if (result.isEmpty) {
-      throw Exception("No users found");
-    }
-
-    return User.fromJson(result.first);
-  }
-
-  //filter
-  Future<List<User>> searchUser(String keyword) async {
-    List<Map<String, Object?>> result = await db!
-        .rawQuery("select * from users where userName LIKE ?", ["%$keyword%"]);
-    return result.map((e) => User.fromJson(e)).toList();
   }
 
   //Create User

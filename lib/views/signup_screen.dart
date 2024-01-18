@@ -22,6 +22,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _formSignupKey = GlobalKey<FormState>();
   bool agreePersonalData = true;
 
+  @override
+  void dispose() {
+    username.dispose();
+    password.dispose();
+    confirmPassword.dispose();
+    super.dispose();
+  }
+
   signUp() async {
     final db = Get.find<DatabaseHelper>();
 
@@ -80,6 +88,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         height: 40.0,
                       ),
                       TextFormField(
+                        autofocus: true,
                         controller: username,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -106,6 +115,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
+                        onEditingComplete: () {
+                          FocusScope.of(context).nextFocus();
+                        },
                       ),
                       const SizedBox(
                         height: 25.0,
@@ -121,32 +133,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         obscureText: !isVisible,
                         obscuringCharacter: '*',
                         decoration: InputDecoration(
-                            label: const Text('Password'),
-                            hintText: 'Enter Password',
-                            hintStyle: const TextStyle(
-                              color: Colors.black26,
+                          label: const Text('Password'),
+                          hintText: 'Enter Password',
+                          hintStyle: const TextStyle(
+                            color: Colors.black26,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12,
                             ),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12,
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              // Toggle password visibility
+                              setState(() {
+                                isVisible = !isVisible;
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                  15.0), // Adjust padding as needed
+                              child: Icon(isVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
                             ),
-                            suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isVisible = !isVisible;
-                                  });
-                                },
-                                icon: Icon(isVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off))),
+                          ),
+                        ),
+                        onEditingComplete: () {
+                          FocusScope.of(context).nextFocus();
+                        },
                       ),
                       const SizedBox(
                         height: 25.0,
@@ -164,32 +186,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         obscureText: !isVisible,
                         obscuringCharacter: '*',
                         decoration: InputDecoration(
-                            label: const Text('Confirm Password'),
-                            hintText: 'Confirm Password',
-                            hintStyle: const TextStyle(
-                              color: Colors.black26,
+                          label: const Text('Confirm Password'),
+                          hintText: 'Confirm Password',
+                          hintStyle: const TextStyle(
+                            color: Colors.black26,
+                          ),
+                          border: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12,
                             ),
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.black12,
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Colors.black12,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () {
+                              // Toggle password visibility
+                              setState(() {
+                                isVisible = !isVisible;
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(
+                                  15.0), // Adjust padding as needed
+                              child: Icon(isVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
                             ),
-                            suffixIcon: IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    isVisible = !isVisible;
-                                  });
-                                },
-                                icon: Icon(isVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off))),
+                          ),
+                        ),
+                        onEditingComplete: () {
+                          signUp();
+                        },
                       ),
                       const SizedBox(
                         height: 25.0,
