@@ -1,12 +1,13 @@
 import 'dart:async';
-
 import 'package:get/get.dart';
+import 'package:intro_project/models/currency.dart';
+import 'package:intro_project/models/order.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
-  final databaseName = "users.db";
+  final databaseName = "archive.db";
   Database? db;
   bool initialise = false;
   String users =
@@ -18,8 +19,14 @@ class DatabaseHelper {
   String currency =
       "create table currency (currencyId INTEGER PRIMARY KEY AUTOINCREMENT,currencyName TEXT UNIQUE,currencySymbol TEXT UNIQUE,rate REAL)";
 
-  RxList filteredData = [].obs;
+  RxList filteredUserData = [].obs;
   List<User> userData = [];
+
+  RxList filteredOrderData = [].obs;
+  List<Order> orderData = [];
+
+  RxList filteredCurrencyData = [].obs;
+  List<Currency> currencyData = [];
 
   Future<Database> initDB() async {
     if (initialise) {
@@ -27,10 +34,17 @@ class DatabaseHelper {
     }
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, databaseName);
-    db = await openDatabase(path, version: 1, onCreate: (db, version) async {
+    db = await openDatabase(path, version: 1, onConfigure: _onConfigure,
+        onCreate: (db, version) async {
       await db.execute(users);
+      await db.execute(orders);
+      await db.execute(currency);
     });
     return db!;
+  }
+
+  static Future _onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
   }
 
   init() async {
@@ -38,6 +52,8 @@ class DatabaseHelper {
     initialise = true;
   }
 
+  //-------------------------------------------------------------------------------------------------------------
+  //Sign in
   Future<bool> login(User user) async {
     final Database db = await initDB();
     var result = await db.rawQuery(
@@ -63,14 +79,13 @@ class DatabaseHelper {
     return response.isNotEmpty;
   }
 
+  //-------------------------------------------------------------------------------------------------------------
   //get All users
   Future<List<User>> getUsers() async {
-    print("Kiser");
     final Database db = await initDB();
     List<Map<String, Object?>> result = await db.query('users');
-    print(result);
     userData = result.map((e) => User.fromJson(e)).toList();
-    filteredData.value = userData;
+    filteredUserData.value = userData;
     return userData;
   }
 
@@ -95,6 +110,88 @@ class DatabaseHelper {
     var result =
         await db!.delete('users', where: 'userId = ?', whereArgs: [userId]);
     getUsers();
+    return result;
+  }
+
+  //-------------------------------------------------------------------------------------------------------------
+  //get all Orders
+  Future<List<Order>> getOrders() async {
+    final Database db = await initDB();
+    List<Map<String, Object?>> result = await db.query('orders');
+    orderData = result.map((e) => Order.fromJson(e)).toList();
+    filteredOrderData.value = orderData;
+    return orderData;
+  }
+
+  //Create Order
+  Future<int> createOrder(Order order) async {
+    var result = await db!.insert('orders', order.toJson());
+    getOrders();
+    return result;
+  }
+
+  //Update Order
+  Future<int> updateOrder(
+    orderId,
+    orderDate,
+    orderAmount,
+    currencyId,
+    status,
+    userId,
+  ) async {
+    var result = await db!.rawUpdate(
+      'update orders set orderAmount = ?, orderDate = ?, currencyId = ?, status = ? WHERE orderId = ? AND userId = ?',
+      [orderAmount, orderDate, currencyId, status, orderId, userId],
+    );
+    getOrders();
+    return result;
+  }
+
+  //Delete Order
+  Future<int> deleteOrder(int orderId) async {
+    var result =
+        await db!.delete('orders', where: 'orderId = ?', whereArgs: [orderId]);
+    getOrders();
+    return result;
+  }
+
+  //-------------------------------------------------------------------------------------------------------------
+  //get all Currency
+  Future<List<Currency>> getCurrencies() async {
+    final Database db = await initDB();
+    List<Map<String, Object?>> result = await db.query('currency');
+    currencyData = result.map((e) => Currency.fromJson(e)).toList();
+    filteredCurrencyData.value = currencyData;
+    return currencyData;
+  }
+
+  //Create Order
+  Future<int> createCurrency(Currency currency) async {
+    var result = await db!.insert('currency', currency.toJson());
+    getCurrencies();
+    return result;
+  }
+
+  //Update Order
+  Future<int> updateCurrency(
+    currencyId,
+    currencyName,
+    currencySymbol,
+    rate,
+  ) async {
+    var result = await db!.rawUpdate(
+      'update currency set currencyName = ?,currencySymbol = ?, rate = ? where currencyId = ?',
+      [currencyName, currencySymbol, rate, currencyId],
+    );
+    getCurrencies();
+    return result;
+  }
+
+  //Delete Order
+  Future<int> deleteCurrency(int currencyId) async {
+    var result = await db!
+        .delete('currency', where: 'currencyId = ?', whereArgs: [currencyId]);
+    getCurrencies();
     return result;
   }
 }

@@ -20,7 +20,7 @@ class _UserArchiveState extends State<UserArchive> {
   final db = Get.find<DatabaseHelper>();
   final formKey = GlobalKey<FormState>();
 
-  RxList get filteredData => Get.find<DatabaseHelper>().filteredData;
+  RxList get filteredData => Get.find<DatabaseHelper>().filteredUserData;
   List get userData => Get.find<DatabaseHelper>().userData;
 
   final username = TextEditingController();
