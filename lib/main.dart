@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/sql/sqlite.dart';
-import 'package:intro_project/views/archive.dart';
+import 'package:intro_project/views/user_archive.dart';
 import 'package:intro_project/views/welcome_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -21,10 +21,15 @@ class MyApp extends StatelessWidget {
       create: (context) => SessionProvider()..initStorage(),
       child: Consumer<SessionProvider>(
           builder: (context, SessionProvider provider, child) {
-        return MaterialApp(
+        return GetMaterialApp(
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
           debugShowCheckedModeBanner: false,
           title: 'Flutter Login',
-          home: provider.rememberMe ? const Archive() : const WelcomeScreen(),
+          home:
+              provider.rememberMe ? const UserArchive() : const WelcomeScreen(),
         );
       }),
     );

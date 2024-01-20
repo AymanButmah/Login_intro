@@ -1,82 +1,29 @@
-// ignore_for_file: use_build_context_synchronously, invalid_use_of_protected_member
+// ignore_for_file: invalid_use_of_protected_member, must_be_immutable
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
-import 'package:intro_project/views/create_userPage.dart';
-import 'package:intro_project/views/edit_userPage.dart';
-import 'package:intro_project/views/welcome_screen.dart';
-import 'package:intro_project/sql/sqlite.dart';
+import 'package:intro_project/widgets/navDrawer.dart';
 import 'package:provider/provider.dart';
 
-class Archive extends StatefulWidget {
-  const Archive({super.key});
+class OrderArchive extends StatelessWidget {
+  OrderArchive({super.key});
 
-  @override
-  State<Archive> createState() => _ArchiveState();
-}
-
-class _ArchiveState extends State<Archive> {
-  final db = Get.find<DatabaseHelper>();
-  final formKey = GlobalKey<FormState>();
-
-  RxList get filteredData => Get.find<DatabaseHelper>().filteredData;
-  List get userData => Get.find<DatabaseHelper>().userData;
-
-  final username = TextEditingController();
-  final password = TextEditingController();
-  final inputKey = TextEditingController();
-
-  @override
-  void initState() {
-    chadMethod();
-    super.initState();
-  }
-
-  chadMethod() async {
-    await Get.find<DatabaseHelper>().init();
-    await Get.find<DatabaseHelper>().getUsers();
-    filteredData.value = userData;
-  }
-
-  //filter
-  void searchUser() {
-    filteredData.value = userData
-        .where((user) =>
-            user.userName!.toLowerCase().contains(inputKey.text.toLowerCase()))
-        .toList();
-  }
-
-  void _deleteData(int id) async {
-    await Get.find<DatabaseHelper>().deleteUser(id);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.red,
-        content: Text("User Deleted Successfully!"),
-      ),
-    );
-  }
+  RxList filteredOrderData = [].obs;
+  List<User> orderData = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const navDrawer(),
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.55,
+        title: const SizedBox(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.maybePop(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const WelcomeScreen()));
-                  },
-                  icon: const Icon(Icons.arrow_back_rounded)),
-              const Text(
-                "User List",
+              Text(
+                "Order List",
                 style: TextStyle(color: Colors.blue),
               ),
             ],
@@ -85,8 +32,7 @@ class _ArchiveState extends State<Archive> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const CreateUser()));
+          // Get.to(() => const CreateUser());
         },
         child: const Icon(Icons.add),
       ),
@@ -99,13 +45,12 @@ class _ArchiveState extends State<Archive> {
                 color: Colors.grey.withOpacity(.2),
                 borderRadius: BorderRadius.circular(8)),
             child: TextFormField(
-              controller: inputKey,
+              // controller: inputKey,
               onChanged: (value) {
                 if (value.isNotEmpty) {
-                  print("Search");
-                  searchUser();
+                  // searchUser();
                 } else {
-                  filteredData.value = userData;
+                  // filteredData.value = userData;
                 }
               },
               decoration: const InputDecoration(
@@ -116,23 +61,25 @@ class _ArchiveState extends State<Archive> {
           ),
           Expanded(
             child: Obx(
-              () => filteredData.value.isEmpty
-                  ? const Center(child: Text('No users available'))
+              () => filteredOrderData.value.isEmpty
+                  ? const Center(child: Text('No Order Available'))
                   : Builder(
                       builder: (context) {
+                        // Dummy data for testing
+                        List<User> dummyData = [
+                          User(userId: 1, userName: 'John Doe'),
+                          User(userId: 2, userName: 'Jane Doe'),
+                          // Add more dummy data as needed
+                        ];
+
                         return Obx(
                           () => ListView.builder(
-                            itemCount: filteredData.value.length,
+                            itemCount: dummyData.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EditUser(
-                                          user: filteredData.value[index]),
-                                    ),
-                                  );
+                                  // Replace with actual navigation logic
+                                  // Get.to(() => EditUser(user: dummyData[index]));
                                 },
                                 child: Card(
                                   elevation: 5,
@@ -143,20 +90,18 @@ class _ArchiveState extends State<Archive> {
                                   ),
                                   child: ListTile(
                                     title: Text(
-                                      "User ID: ${filteredData.value[index].userId?.toString() ?? ""}",
+                                      "User ID: ${dummyData[index].userId?.toString() ?? ""}",
                                       style:
                                           const TextStyle(color: Colors.blue),
                                     ),
                                     subtitle: Text(
-                                        "Name: ${filteredData.value[index].userName ?? ""} "),
+                                        "Name: ${dummyData[index].userName ?? ""} "),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.delete),
                                       color: Colors.red,
                                       onPressed: () {
-                                        // db.deleteUser(userList[index].userId!);
-                                        _deleteData(
-                                            filteredData.value[index].userId ??
-                                                0);
+                                        // Replace with actual delete logic
+                                        // _deleteData(dummyData[index].userId ?? 0);
                                       },
                                     ),
                                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class WelcomeButton extends StatelessWidget {
   const WelcomeButton(
@@ -12,12 +13,7 @@ class WelcomeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (e) => onTap!,
-          ),
-        );
+        Get.to(() => onTap!);
       },
       child: Container(
         padding: const EdgeInsets.all(30.0),

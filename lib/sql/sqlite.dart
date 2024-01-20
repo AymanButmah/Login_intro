@@ -12,6 +12,12 @@ class DatabaseHelper {
   String users =
       "create table users (userId INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT UNIQUE, userPassword TEXT)";
 
+  String orders =
+      "create table orders (orderId INTEGER PRIMARY KEY AUTOINCREMENT,orderDate TEXT,orderAmount REAL,equalOrderAmount REAL,currencyId INTEGER,status BOOLEAN,userId INTEGER,FOREIGN KEY (userId) REFERENCES users(userId),FOREIGN KEY (currencyId) REFERENCES currency(currencyId))";
+
+  String currency =
+      "create table currency (currencyId INTEGER PRIMARY KEY AUTOINCREMENT,currencyName TEXT UNIQUE,currencySymbol TEXT UNIQUE,rate REAL)";
+
   RxList filteredData = [].obs;
   List<User> userData = [];
 

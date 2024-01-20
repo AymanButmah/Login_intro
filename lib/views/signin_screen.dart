@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
-import 'package:intro_project/views/archive.dart';
+import 'package:intro_project/views/user_archive.dart';
 import 'package:intro_project/views/signup_screen.dart';
 import 'package:intro_project/sql/sqlite.dart';
 import 'package:intro_project/widgets/custom_scaffold.dart';
@@ -44,10 +44,7 @@ class _SignInScreenState extends State<SignInScreen> {
         // if check setremmber me becomes true then session true
         Provider.of<SessionProvider>(context, listen: false).setRememberMe();
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Archive()),
-        );
+        Get.offAll(() => const UserArchive());
       } else {
         setState(() {
           isLoginTrue = true;
@@ -302,11 +299,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SignUpScreen()));
+                              Get.to(() => const SignUpScreen());
                             },
                             child: const Text(
                               'Sign up',

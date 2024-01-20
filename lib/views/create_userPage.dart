@@ -100,7 +100,7 @@ class _CreateUserState extends State<CreateUser> {
         userPassword: password.text,
       ))
           .whenComplete(() {
-        Navigator.of(context).pop(true);
+        Get.back();
       });
     }
   }

@@ -53,7 +53,7 @@ class _EditUserState extends State<EditUser> {
                     widget.user.userId,
                   )
                       .whenComplete(() {
-                    Navigator.pop(context);
+                    Get.back();
                   });
                 }
               },
@@ -128,7 +128,7 @@ class _EditUserState extends State<EditUser> {
         widget.user.userId,
       )
           .whenComplete(() {
-        Navigator.pop(context);
+        Get.back();
       });
     }
   }

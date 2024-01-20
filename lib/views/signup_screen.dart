@@ -42,8 +42,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       db
           .signup(User(userName: username.text, userPassword: password.text))
           .whenComplete(() {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const SignInScreen()));
+        Get.offAll(() => const SignInScreen());
       });
     }
   }
@@ -347,11 +346,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SignInScreen()));
+                              Get.offAll(() => const SignInScreen());
                             },
                             child: const Text(
                               'Sign in',
