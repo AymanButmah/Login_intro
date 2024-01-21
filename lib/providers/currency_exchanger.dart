@@ -7,7 +7,7 @@ class CurrencyExchanger extends GetxController {
     if (currency.toLowerCase() == 'shekel' || currency == '₪') {
       equalAmount.value = amount;
     } else {
-      equalAmount.value = rate / amount;
+      equalAmount.value = amount / rate;
     }
   }
 }

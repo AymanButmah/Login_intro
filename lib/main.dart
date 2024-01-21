@@ -22,10 +22,6 @@ class MyApp extends StatelessWidget {
       child: Consumer<SessionProvider>(
           builder: (context, SessionProvider provider, child) {
         return GetMaterialApp(
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-            useMaterial3: true,
-          ),
           debugShowCheckedModeBanner: false,
           title: 'Flutter Login',
           home:

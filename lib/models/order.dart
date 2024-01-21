@@ -19,12 +19,13 @@ class Order {
       this.userId});
 
   Order.fromJson(Map<String, dynamic> json) {
+    print("object ${json['status']}");
     orderId = json['orderId'];
     orderDate = json['orderDate'];
     orderAmount = json['orderAmount'];
     equalOrderAmount = json['equalOrderAmount'];
     currencyId = json['currencyId'];
-    status = json['status'];
+    status = json['status'] == 1 ? true : false;
     orderType = json['orderType'];
     userId = json['userId'];
   }

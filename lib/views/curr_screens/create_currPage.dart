@@ -17,7 +17,6 @@ class _CreateCurrencyState extends State<CreateCurrency> {
   final currencyName = TextEditingController();
   final currencySymbol = TextEditingController();
   final currencyRate = TextEditingController();
-  final orderDate = TextEditingController();
   final formKey = GlobalKey<FormState>();
   final db = Get.find<DatabaseHelper>();
 
@@ -44,26 +43,6 @@ class _CreateCurrencyState extends State<CreateCurrency> {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              TextFormField(
-                autofocus: true,
-                controller: orderDate,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Order Date is required";
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.datetime,
-                inputFormatters: [
-                  FilteringTextInputFormatter.deny(RegExp(r'[^0-9/]')),
-                ],
-                decoration: const InputDecoration(
-                  labelText: "Order Date",
-                ),
-                onEditingComplete: () {
-                  FocusScope.of(context).nextFocus();
-                },
-              ),
               TextFormField(
                 autofocus: true,
                 controller: currencyName,

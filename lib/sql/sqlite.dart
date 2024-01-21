@@ -37,8 +37,8 @@ class DatabaseHelper {
     db = await openDatabase(path, version: 1, onConfigure: _onConfigure,
         onCreate: (db, version) async {
       await db.execute(users);
-      await db.execute(orders);
       await db.execute(currency);
+      await db.execute(orders);
     });
     return db!;
   }
@@ -146,14 +146,24 @@ class DatabaseHelper {
     orderId,
     orderDate,
     orderAmount,
+    equalOrderAmount,
     currencyId,
     status,
     orderType,
     userId,
   ) async {
     var result = await db!.rawUpdate(
-      'update orders set orderAmount = ?, orderDate = ?, currencyId = ?, status = ?,orderType = ? WHERE orderId = ? AND userId = ?',
-      [orderAmount, orderDate, currencyId, status, orderType, orderId, userId],
+      'update orders set orderAmount = ?,equalOrderAmount = ?, orderDate = ?, currencyId = ?, status = ?,orderType = ? WHERE orderId = ? AND userId = ?',
+      [
+        orderAmount,
+        equalOrderAmount,
+        orderDate,
+        currencyId,
+        status,
+        orderType,
+        orderId,
+        userId
+      ],
     );
     getOrders();
     return result;

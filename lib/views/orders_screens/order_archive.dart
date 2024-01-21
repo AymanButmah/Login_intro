@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/sql/sqlite.dart';
+import 'package:intro_project/views/orders_screens/create_orderPage.dart';
+import 'package:intro_project/views/orders_screens/edit_orderPage.dart';
 import 'package:intro_project/widgets/navDrawer.dart';
 import 'package:provider/provider.dart';
 
@@ -35,26 +37,21 @@ class _OrderArchiveState extends State<OrderArchive> {
     filteredOrderData.value = orderData;
   }
 
-  // void _deleteData(int id) async {
-  //   await Get.find<DatabaseHelper>().deleteOrder(id);
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     const SnackBar(
-  //       backgroundColor: Colors.red,
-  //       content: Text("Order Deleted Successfully!"),
-  //     ),
-  //   );
-  // }
+  void _deleteData(int id) async {
+    await Get.find<DatabaseHelper>().deleteOrder(id);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.red,
+        content: Text("Order Deleted Successfully!"),
+      ),
+    );
+  }
 
-  //filter
-  // void searchOrder() {
-
-  //     filteredOrderData.value = orderData
-  //         .where((order) => order.userId
-  //             .toLowerCase()
-  //             .contains(inputKey.text.toLowerCase()))
-  //         .toList();
-
-  // }
+  // filter
+  void searchOrder() {
+    filteredOrderData.value =
+        orderData.where((order) => order.orderId == inputKey.text).toList();
+  }
 
   Widget buildOrderIcon(int index) {
     bool OrderStatus = filteredOrderData.value[index].status ?? false;
@@ -96,7 +93,7 @@ class _OrderArchiveState extends State<OrderArchive> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Get.to(() => const CreateCurrency());
+          Get.to(() => const CreateOrder());
         },
         child: const Icon(Icons.add),
       ),
@@ -112,9 +109,9 @@ class _OrderArchiveState extends State<OrderArchive> {
               controller: inputKey,
               onChanged: (value) {
                 if (value.isNotEmpty) {
-                  // searchOrder();
+                  searchOrder();
                 } else {
-                  // filteredOrderData.value = orderData;
+                  filteredOrderData.value = orderData;
                 }
               },
               decoration: const InputDecoration(
@@ -135,9 +132,8 @@ class _OrderArchiveState extends State<OrderArchive> {
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  // Get.to(() => EditCurrency(
-                                  //     currency:
-                                  //         filteredOrderData.value[index]));
+                                  Get.to(() => EditOrder(
+                                      order: filteredOrderData.value[index]));
                                 },
                                 child: Card(
                                   elevation: 5,
@@ -154,14 +150,14 @@ class _OrderArchiveState extends State<OrderArchive> {
                                           const TextStyle(color: Colors.blue),
                                     ),
                                     subtitle: Text(
-                                        "${filteredOrderData.value[index].userId ?? ""} "),
+                                        "User ID: ${filteredOrderData.value[index].userId ?? ""} "),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.delete),
                                       color: Colors.red,
                                       onPressed: () {
-                                        // _deleteData(filteredOrderData
-                                        //         .value[index].orderId ??
-                                        //     0);
+                                        _deleteData(filteredOrderData
+                                                .value[index].orderId ??
+                                            0);
                                       },
                                     ),
                                   ),
