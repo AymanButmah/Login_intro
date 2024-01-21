@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intro_project/providers/provider.dart';
-import 'package:intro_project/views/create_userPage.dart';
-import 'package:intro_project/views/edit_userPage.dart';
+import 'package:intro_project/views/user_screens/create_userPage.dart';
+import 'package:intro_project/views/user_screens/edit_userPage.dart';
 import 'package:intro_project/sql/sqlite.dart';
 import 'package:intro_project/widgets/navDrawer.dart';
 import 'package:provider/provider.dart';
@@ -23,8 +23,6 @@ class _UserArchiveState extends State<UserArchive> {
   RxList get filteredData => Get.find<DatabaseHelper>().filteredUserData;
   List get userData => Get.find<DatabaseHelper>().userData;
 
-  final username = TextEditingController();
-  final password = TextEditingController();
   final inputKey = TextEditingController();
 
   @override

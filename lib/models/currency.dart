@@ -2,16 +2,19 @@ class Currency {
   int? currencyId;
   String? currencyName;
   String? currencySymbol;
-  double? rate;
+  double? currencyRate;
 
   Currency(
-      {this.currencyId, this.currencyName, this.currencySymbol, this.rate});
+      {this.currencyId,
+      this.currencyName,
+      this.currencySymbol,
+      this.currencyRate});
 
   Currency.fromJson(Map<String, dynamic> json) {
     currencyId = json['currencyId'];
     currencyName = json['currencyName'];
     currencySymbol = json['currencySymbol'];
-    rate = json['Rate'];
+    currencyRate = json['currencyRate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -19,7 +22,7 @@ class Currency {
     data['currencyId'] = currencyId;
     data['currencyName'] = currencyName;
     data['currencySymbol'] = currencySymbol;
-    data['Rate'] = rate;
+    data['currencyRate'] = currencyRate;
     return data;
   }
 }

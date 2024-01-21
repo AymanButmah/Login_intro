@@ -1,17 +1,81 @@
-// ignore_for_file: invalid_use_of_protected_member, must_be_immutable
+// ignore_for_file: invalid_use_of_protected_member, must_be_immutable, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
+import 'package:intro_project/sql/sqlite.dart';
 import 'package:intro_project/widgets/navDrawer.dart';
 import 'package:provider/provider.dart';
 
-class CurrencyArchive extends StatelessWidget {
-  CurrencyArchive({super.key});
+class OrderArchive extends StatefulWidget {
+  const OrderArchive({super.key});
 
-  RxList filteredOrderData = [].obs;
-  List<User> CurrencyData = [];
+  @override
+  State<OrderArchive> createState() => _OrderArchiveState();
+}
+
+class _OrderArchiveState extends State<OrderArchive> {
+  final db = Get.find<DatabaseHelper>();
+  final formKey = GlobalKey<FormState>();
+
+  RxList get filteredOrderData => Get.find<DatabaseHelper>().filteredOrderData;
+  List get orderData => Get.find<DatabaseHelper>().orderData;
+
+  final inputKey = TextEditingController();
+
+  @override
+  void initState() {
+    chadMethod();
+    super.initState();
+  }
+
+  chadMethod() async {
+    await Get.find<DatabaseHelper>().init();
+    await Get.find<DatabaseHelper>().getOrders();
+    filteredOrderData.value = orderData;
+  }
+
+  // void _deleteData(int id) async {
+  //   await Get.find<DatabaseHelper>().deleteOrder(id);
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     const SnackBar(
+  //       backgroundColor: Colors.red,
+  //       content: Text("Order Deleted Successfully!"),
+  //     ),
+  //   );
+  // }
+
+  //filter
+  // void searchOrder() {
+
+  //     filteredOrderData.value = orderData
+  //         .where((order) => order.userId
+  //             .toLowerCase()
+  //             .contains(inputKey.text.toLowerCase()))
+  //         .toList();
+
+  // }
+
+  Widget buildOrderIcon(int index) {
+    bool OrderStatus = filteredOrderData.value[index].status ?? false;
+
+    if (OrderStatus == true) {
+      return const Icon(
+        Icons.done_all_rounded,
+        color: Colors.green,
+      );
+    } else if (OrderStatus == false) {
+      return const Icon(
+        Icons.warning_amber_rounded,
+        color: Colors.orange,
+      );
+    } else {
+      return const Icon(
+        Icons.error,
+        color: Colors.red,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +87,7 @@ class CurrencyArchive extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Currency List",
+                "Order List",
                 style: TextStyle(color: Colors.blue),
               ),
             ],
@@ -32,7 +96,7 @@ class CurrencyArchive extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Get.to(() => const CreateUser());
+          // Get.to(() => const CreateCurrency());
         },
         child: const Icon(Icons.add),
       ),
@@ -45,12 +109,12 @@ class CurrencyArchive extends StatelessWidget {
                 color: Colors.grey.withOpacity(.2),
                 borderRadius: BorderRadius.circular(8)),
             child: TextFormField(
-              // controller: inputKey,
+              controller: inputKey,
               onChanged: (value) {
                 if (value.isNotEmpty) {
-                  // searchUser();
+                  // searchOrder();
                 } else {
-                  // filteredData.value = userData;
+                  // filteredOrderData.value = orderData;
                 }
               },
               decoration: const InputDecoration(
@@ -62,24 +126,18 @@ class CurrencyArchive extends StatelessWidget {
           Expanded(
             child: Obx(
               () => filteredOrderData.value.isEmpty
-                  ? const Center(child: Text('No Order Available'))
+                  ? const Center(child: Text('No Order available'))
                   : Builder(
                       builder: (context) {
-                        // Dummy data for testing
-                        List<User> dummyData = [
-                          User(userId: 1, userName: 'John Doe'),
-                          User(userId: 2, userName: 'Jane Doe'),
-                          // Add more dummy data as needed
-                        ];
-
                         return Obx(
                           () => ListView.builder(
-                            itemCount: dummyData.length,
+                            itemCount: filteredOrderData.value.length,
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  // Replace with actual navigation logic
-                                  // Get.to(() => EditUser(user: dummyData[index]));
+                                  // Get.to(() => EditCurrency(
+                                  //     currency:
+                                  //         filteredOrderData.value[index]));
                                 },
                                 child: Card(
                                   elevation: 5,
@@ -89,19 +147,21 @@ class CurrencyArchive extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: ListTile(
+                                    leading: buildOrderIcon(index),
                                     title: Text(
-                                      "User ID: ${dummyData[index].userId?.toString() ?? ""}",
+                                      "Order ID: ${filteredOrderData.value[index].orderId?.toString() ?? ""} ~ Order Amount: ${filteredOrderData.value[index].orderAmount?.toString() ?? ""}",
                                       style:
                                           const TextStyle(color: Colors.blue),
                                     ),
                                     subtitle: Text(
-                                        "Name: ${dummyData[index].userName ?? ""} "),
+                                        "${filteredOrderData.value[index].userId ?? ""} "),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.delete),
                                       color: Colors.red,
                                       onPressed: () {
-                                        // Replace with actual delete logic
-                                        // _deleteData(dummyData[index].userId ?? 0);
+                                        // _deleteData(filteredOrderData
+                                        //         .value[index].orderId ??
+                                        //     0);
                                       },
                                     ),
                                   ),

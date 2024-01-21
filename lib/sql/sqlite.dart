@@ -14,10 +14,10 @@ class DatabaseHelper {
       "create table users (userId INTEGER PRIMARY KEY AUTOINCREMENT, userName TEXT UNIQUE, userPassword TEXT)";
 
   String orders =
-      "create table orders (orderId INTEGER PRIMARY KEY AUTOINCREMENT,orderDate TEXT,orderAmount REAL,equalOrderAmount REAL,currencyId INTEGER,status BOOLEAN,userId INTEGER,FOREIGN KEY (userId) REFERENCES users(userId),FOREIGN KEY (currencyId) REFERENCES currency(currencyId))";
+      "create table orders (orderId INTEGER PRIMARY KEY AUTOINCREMENT,orderDate TEXT,orderAmount REAL,equalOrderAmount REAL,currencyId INTEGER,status BOOLEAN,orderType TEXT,userId INTEGER,FOREIGN KEY (userId) REFERENCES users(userId),FOREIGN KEY (currencyId) REFERENCES currency(currencyId))";
 
   String currency =
-      "create table currency (currencyId INTEGER PRIMARY KEY AUTOINCREMENT,currencyName TEXT UNIQUE,currencySymbol TEXT UNIQUE,rate REAL)";
+      "create table currency (currencyId INTEGER PRIMARY KEY AUTOINCREMENT,currencyName TEXT UNIQUE,currencySymbol TEXT UNIQUE,currencyRate REAL)";
 
   RxList filteredUserData = [].obs;
   List<User> userData = [];
@@ -123,6 +123,17 @@ class DatabaseHelper {
     return orderData;
   }
 
+//get all Orders by User
+  Future<List<Order>> getAllOrdersByUser(User user) async {
+    final Database db = await initDB();
+    List<Map<String, dynamic>> allRows = await db.rawQuery('''
+    SELECT * FROM orders 
+    WHERE userId = ${user.userId}
+    ''');
+    List<Order> orders = allRows.map((order) => Order.fromJson(order)).toList();
+    return orders;
+  }
+
   //Create Order
   Future<int> createOrder(Order order) async {
     var result = await db!.insert('orders', order.toJson());
@@ -137,11 +148,12 @@ class DatabaseHelper {
     orderAmount,
     currencyId,
     status,
+    orderType,
     userId,
   ) async {
     var result = await db!.rawUpdate(
-      'update orders set orderAmount = ?, orderDate = ?, currencyId = ?, status = ? WHERE orderId = ? AND userId = ?',
-      [orderAmount, orderDate, currencyId, status, orderId, userId],
+      'update orders set orderAmount = ?, orderDate = ?, currencyId = ?, status = ?,orderType = ? WHERE orderId = ? AND userId = ?',
+      [orderAmount, orderDate, currencyId, status, orderType, orderId, userId],
     );
     getOrders();
     return result;
@@ -177,11 +189,11 @@ class DatabaseHelper {
     currencyId,
     currencyName,
     currencySymbol,
-    rate,
+    currencyRate,
   ) async {
     var result = await db!.rawUpdate(
-      'update currency set currencyName = ?,currencySymbol = ?, rate = ? where currencyId = ?',
-      [currencyName, currencySymbol, rate, currencyId],
+      'update currency set currencyName = ?,currencySymbol = ?, currencyRate = ? where currencyId = ?',
+      [currencyName, currencySymbol, currencyRate, currencyId],
     );
     getCurrencies();
     return result;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intro_project/views/signin_screen.dart';
+import 'package:intro_project/views/Auth/signin_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionProvider extends ChangeNotifier {

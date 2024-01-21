@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intro_project/providers/provider.dart';
-import 'package:intro_project/views/currency_archive.dart';
-import 'package:intro_project/views/order_archive.dart';
-import 'package:intro_project/views/user_archive.dart';
+import 'package:intro_project/views/curr_screens/currency_archive.dart';
+import 'package:intro_project/views/orders_screens/order_archive.dart';
+import 'package:intro_project/views/user_screens/user_archive.dart';
 import 'package:provider/provider.dart';
 
 class navDrawer extends StatelessWidget {

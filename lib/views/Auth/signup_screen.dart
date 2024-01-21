@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:intro_project/models/user.dart';
-import 'package:intro_project/views/signin_screen.dart';
+import 'package:intro_project/views/Auth/signin_screen.dart';
 import 'package:intro_project/sql/sqlite.dart';
 import 'package:intro_project/widgets/custom_scaffold.dart';
 
