@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intro_project/models/order.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/sql/sqlite.dart';
 import 'package:intro_project/views/orders_screens/create_orderPage.dart';
@@ -23,7 +24,21 @@ class _OrderArchiveState extends State<OrderArchive> {
   RxList get filteredOrderData => Get.find<DatabaseHelper>().filteredOrderData;
   List get orderData => Get.find<DatabaseHelper>().orderData;
 
-  final inputKey = TextEditingController();
+  RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
+  List get userData => Get.find<DatabaseHelper>().userData;
+
+  // String? _selectedUser;
+  // final inputKey = TextEditingController();
+  String? _selectedAnimal;
+
+  // final List<String> _suggestions = [
+  //   'Alligator',
+  //   'Buffalo',
+  //   'Chicken',
+  //   'Dog',
+  //   'Eagle',
+  //   'Frog'
+  // ];
 
   @override
   void initState() {
@@ -34,7 +49,16 @@ class _OrderArchiveState extends State<OrderArchive> {
   chadMethod() async {
     await Get.find<DatabaseHelper>().init();
     await Get.find<DatabaseHelper>().getOrders();
+    await Get.find<DatabaseHelper>().getUsers();
+
     filteredOrderData.value = orderData;
+    filteredUserData.value = userData;
+  }
+
+  Future<void> fetchAndSetOrders(int userId) async {
+    List<Order> orders =
+        await Get.find<DatabaseHelper>().getOrdersByUserId(userId);
+    filteredOrderData.value = orders;
   }
 
   void _deleteData(int id) async {
@@ -45,12 +69,6 @@ class _OrderArchiveState extends State<OrderArchive> {
         content: Text("Order Deleted Successfully!"),
       ),
     );
-  }
-
-  // filter
-  void searchOrder() {
-    filteredOrderData.value =
-        orderData.where((order) => order.orderId == inputKey.text).toList();
   }
 
   Widget buildOrderIcon(int index) {
@@ -105,20 +123,37 @@ class _OrderArchiveState extends State<OrderArchive> {
             decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(.2),
                 borderRadius: BorderRadius.circular(8)),
-            child: TextFormField(
-              controller: inputKey,
-              onChanged: (value) {
-                if (value.isNotEmpty) {
-                  searchOrder();
-                } else {
-                  filteredOrderData.value = orderData;
-                }
-              },
-              decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  icon: Icon(Icons.search),
-                  hintText: "Search"),
-            ),
+            // child: Autocomplete<String>(
+            //   optionsBuilder: (TextEditingValue value) {
+            //     // When the field is empty
+            //     if (value.text.isEmpty) {
+            //       return [];
+            //     }
+
+            //     return (filteredUserData.value).where((user) =>
+            //         user.toLowerCase().contains(value.text.toLowerCase()));
+            //   },
+            //   onSelected: (value) {
+            //     setState(() {
+            //       _selectedAnimal = value;
+            //     });
+            //   },
+            // ),
+
+            // TextFormField(
+            //   controller: inputKey,
+            //   onChanged: (value) {
+            //     if (value.isNotEmpty) {
+            //       searchOrder();
+            //     } else {
+            //       filteredOrderData.value = orderData;
+            //     }
+            //   },
+            //   decoration: const InputDecoration(
+            //       border: InputBorder.none,
+            //       icon: Icon(Icons.search),
+            //       hintText: "Search"),
+            // ),
           ),
           Expanded(
             child: Obx(

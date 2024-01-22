@@ -124,14 +124,21 @@ class DatabaseHelper {
   }
 
 //get all Orders by User
-  Future<List<Order>> getAllOrdersByUser(User user) async {
+  Future<List<Order>> getAllOrdersByUser(userId) async {
     final Database db = await initDB();
     List<Map<String, dynamic>> allRows = await db.rawQuery('''
     SELECT * FROM orders 
-    WHERE userId = ${user.userId}
+    WHERE userId = {$userId}
     ''');
     List<Order> orders = allRows.map((order) => Order.fromJson(order)).toList();
     return orders;
+  }
+
+  Future<List<Order>> getOrdersByUserId(int userId) async {
+    final Database db = await initDB();
+    final result =
+        await db.query('orders', where: 'userId = ?', whereArgs: [userId]);
+    return result.map((json) => Order.fromJson(json)).toList();
   }
 
   //Create Order

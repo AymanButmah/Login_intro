@@ -36,6 +36,26 @@ class _EditOrderState extends State<EditOrder> {
   List<User> get userData => Get.find<DatabaseHelper>().userData;
   List<Currency> get currencyData => Get.find<DatabaseHelper>().currencyData;
 
+  double _currencyRate = Currency().currencyRate ?? 0.0;
+
+  void calculateEqualOrderAmount() {
+    switch (_currencyName) {
+      case "shekel":
+        _currencyRate;
+        break;
+      case "dollar":
+        _currencyRate;
+        break;
+      case "euro":
+        _currencyRate;
+        break;
+    }
+
+    double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
+    double calculatedEqualOrderAmount = orderAmountValue / _currencyRate;
+    equalOrderAmount.text = calculatedEqualOrderAmount.toStringAsFixed(2);
+  }
+
   @override
   void initState() {
     orderDate.text =
@@ -55,6 +75,10 @@ class _EditOrderState extends State<EditOrder> {
     _currencyId = widget.order.currencyId == null
         ? "0"
         : widget.order.currencyId.toString();
+
+    orderAmount.addListener(() {
+      calculateEqualOrderAmount();
+    });
 
     super.initState();
   }
@@ -139,10 +163,11 @@ class _EditOrderState extends State<EditOrder> {
                   FocusScope.of(context).nextFocus();
                 },
               ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Obx(
                 () => Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8),
@@ -150,7 +175,7 @@ class _EditOrderState extends State<EditOrder> {
                   child: Row(
                     children: [
                       const Text(
-                        'Choose Curr: ',
+                        'Choosed Curr: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -172,6 +197,7 @@ class _EditOrderState extends State<EditOrder> {
                                   setState(() {
                                     _currencyName =
                                         curr.currencyName.toString();
+                                    _currencyRate = curr.currencyRate ?? 0.0;
                                   });
                                 },
                                 value: curr.currencyId.toString(),
@@ -185,50 +211,62 @@ class _EditOrderState extends State<EditOrder> {
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
-              TextFormField(
-                autofocus: true,
-                controller: orderAmount,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Order Amount is required";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  labelText: "Order Amount",
-                ),
-                onEditingComplete: () {
-                  FocusScope.of(context).nextFocus();
-                },
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      autofocus: true,
+                      controller: orderAmount,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d*\.?\d*$')),
+                      ],
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Order Amount is required";
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "Order Amount",
+                      ),
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      enabled: false,
+                      controller: equalOrderAmount,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Equal Order Amount is required";
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: "Equal Order Amount",
+                      ),
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5),
-              TextFormField(
-                autofocus: true,
-                controller: equalOrderAmount,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Equal Order Amount is required";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  labelText: "Equal Order Amount",
-                ),
-                onEditingComplete: () {
-                  FocusScope.of(context).nextFocus();
-                },
-              ),
-              const SizedBox(height: 5),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               DropdownButtonHideUnderline(
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.grey), // Add a border for styling
-                    borderRadius:
-                        BorderRadius.circular(8), // Add rounded corners
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
@@ -259,28 +297,26 @@ class _EditOrderState extends State<EditOrder> {
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               DropdownButtonHideUnderline(
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.grey), // Add a border for styling
-                    borderRadius:
-                        BorderRadius.circular(8), // Add rounded corners
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
                       const Text(
-                        'Choose Order: ',
+                        'Choosed Order: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Expanded(
                         child: DropdownButton<String>(
-                          hint: Text(orderType.text), // Add a hint
+                          hint: Text(orderType.text),
                           onChanged: (String? value) {
                             setState(() {
                               orderType.text = value ?? "";
@@ -303,11 +339,11 @@ class _EditOrderState extends State<EditOrder> {
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Obx(
                 () => Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8),
@@ -315,7 +351,7 @@ class _EditOrderState extends State<EditOrder> {
                   child: Row(
                     children: [
                       const Text(
-                        'Choose User: ',
+                        'Choosed User: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
@@ -348,7 +384,7 @@ class _EditOrderState extends State<EditOrder> {
                   ),
                 ),
               ),
-              const SizedBox(height: 5),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               ElevatedButton(
                 onPressed: () {
                   _submitForm();
@@ -362,7 +398,7 @@ class _EditOrderState extends State<EditOrder> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text("Create Order"),
+                child: const Text("Update Order"),
               ),
             ],
           ),
