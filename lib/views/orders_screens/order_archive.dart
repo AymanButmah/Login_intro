@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intro_project/models/order.dart';
 import 'package:intro_project/providers/provider.dart';
+import 'package:intro_project/providers/switch_status.dart';
 import 'package:intro_project/sql/sqlite.dart';
 import 'package:intro_project/views/orders_screens/create_orderPage.dart';
 import 'package:intro_project/views/orders_screens/edit_orderPage.dart';
@@ -26,6 +27,8 @@ class _OrderArchiveState extends State<OrderArchive> {
 
   RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
   List get userData => Get.find<DatabaseHelper>().userData;
+
+  final SwitchController _switchController = Get.put(SwitchController());
 
   // String? _selectedUser;
   // final inputKey = TextEditingController();
@@ -157,49 +160,57 @@ class _OrderArchiveState extends State<OrderArchive> {
           ),
           Expanded(
             child: Obx(
-              () => filteredOrderData.value.isEmpty
+              () => filteredOrderData.isEmpty
                   ? const Center(child: Text('No Order available'))
                   : Builder(
                       builder: (context) {
-                        return Obx(
-                          () => ListView.builder(
-                            itemCount: filteredOrderData.value.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Get.to(() => EditOrder(
-                                      order: filteredOrderData.value[index]));
-                                },
-                                child: Card(
-                                  elevation: 5,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                        return ListView.builder(
+                          itemCount: filteredOrderData.length,
+                          itemBuilder: (context, index) {
+                            final order = filteredOrderData[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Get.to(() => EditOrder(order: order));
+                              },
+                              child: Card(
+                                elevation: 5,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                child: ListTile(
+                                  leading: Switch(
+                                    value: order.status ?? false,
+                                    onChanged: (newStatus) {
+                                      setState(() {
+                                        order.status = newStatus;
+
+                                        // SwitchController()
+                                        //     .changeStatus(newStatus);
+                                      });
+                                      order.status = newStatus;
+                                      print(
+                                          "Order status changed to: $newStatus");
+                                    },
                                   ),
-                                  child: ListTile(
-                                    leading: buildOrderIcon(index),
-                                    title: Text(
-                                      "Order ID: ${filteredOrderData.value[index].orderId?.toString() ?? ""} ~ Order Amount: ${filteredOrderData.value[index].orderAmount?.toString() ?? ""}",
-                                      style:
-                                          const TextStyle(color: Colors.blue),
-                                    ),
-                                    subtitle: Text(
-                                        "User ID: ${filteredOrderData.value[index].userId ?? ""} "),
-                                    trailing: IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      color: Colors.red,
-                                      onPressed: () {
-                                        _deleteData(filteredOrderData
-                                                .value[index].orderId ??
-                                            0);
-                                      },
-                                    ),
+                                  title: Text(
+                                    "Order ID: ${order.orderId?.toString() ?? ""} ~ Order Amount: ${order.orderAmount?.toString() ?? ""}",
+                                    style: const TextStyle(color: Colors.blue),
+                                  ),
+                                  subtitle:
+                                      Text("User ID: ${order.userId ?? ""} "),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    color: Colors.red,
+                                    onPressed: () {
+                                      _deleteData(order.orderId ?? 0);
+                                    },
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
