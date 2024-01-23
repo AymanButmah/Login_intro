@@ -18,4 +18,9 @@ class User {
     data['userPassword'] = userPassword;
     return data;
   }
+
+  @override
+  String toString() {
+    return userName!;
+  }
 }

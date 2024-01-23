@@ -78,14 +78,17 @@ class _CurrencyArchiveState extends State<CurrencyArchive> {
     return Scaffold(
       drawer: const navDrawer(),
       appBar: AppBar(
-        title: const SizedBox(
+        title: SizedBox(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "Currency List",
                 style: TextStyle(color: Colors.blue),
               ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.1,
+              )
             ],
           ),
         ),

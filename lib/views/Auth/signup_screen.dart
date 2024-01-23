@@ -151,14 +151,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           suffixIcon: GestureDetector(
                             onTap: () {
-                              // Toggle password visibility
                               setState(() {
                                 isVisible = !isVisible;
                               });
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(
-                                  15.0), // Adjust padding as needed
+                              padding: const EdgeInsets.all(15.0),
                               child: Icon(isVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off),
@@ -204,14 +202,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           suffixIcon: GestureDetector(
                             onTap: () {
-                              // Toggle password visibility
                               setState(() {
                                 isVisible = !isVisible;
                               });
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(
-                                  15.0), // Adjust padding as needed
+                              padding: const EdgeInsets.all(15.0),
                               child: Icon(isVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off),

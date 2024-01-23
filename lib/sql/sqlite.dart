@@ -19,7 +19,7 @@ class DatabaseHelper {
   String currency =
       "create table currency (currencyId INTEGER PRIMARY KEY AUTOINCREMENT,currencyName TEXT UNIQUE,currencySymbol TEXT UNIQUE,currencyRate REAL)";
 
-  RxList filteredUserData = [].obs;
+  RxList<User> filteredUserData = <User>[].obs;
   List<User> userData = [];
 
   RxList filteredOrderData = [].obs;
@@ -128,7 +128,7 @@ class DatabaseHelper {
     final Database db = await initDB();
     List<Map<String, dynamic>> allRows = await db.rawQuery('''
     SELECT * FROM orders 
-    WHERE userId = {$userId}
+    WHERE userId = $userId
     ''');
     List<Order> orders = allRows.map((order) => Order.fromJson(order)).toList();
     return orders;

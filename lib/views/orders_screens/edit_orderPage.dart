@@ -26,7 +26,7 @@ class _EditOrderState extends State<EditOrder> {
   String? _userId;
   String? _currencyId;
   String? _userName;
-  String? _currencyName;
+  String? currencyNameMenu;
   final formKey = GlobalKey<FormState>();
   final db = Get.find<DatabaseHelper>();
 
@@ -39,16 +39,8 @@ class _EditOrderState extends State<EditOrder> {
   double _currencyRate = Currency().currencyRate ?? 0.0;
 
   void calculateEqualOrderAmount() {
-    switch (_currencyName) {
-      case "shekel":
-        _currencyRate;
-        break;
-      case "dollar":
-        _currencyRate;
-        break;
-      case "euro":
-        _currencyRate;
-        break;
+    if (currencyNameMenu?.toLowerCase() != null) {
+      _currencyRate = _currencyRate;
     }
 
     double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
@@ -183,7 +175,7 @@ class _EditOrderState extends State<EditOrder> {
                       Expanded(
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
-                            hint: Text(_currencyName ?? "Choose Curr"),
+                            hint: Text(currencyNameMenu ?? "Choose Curr"),
                             onChanged: (String? value) {
                               setState(() {
                                 _currencyId = value ?? "";
@@ -195,7 +187,7 @@ class _EditOrderState extends State<EditOrder> {
                               return DropdownMenuItem<String>(
                                 onTap: () {
                                   setState(() {
-                                    _currencyName =
+                                    currencyNameMenu =
                                         curr.currencyName.toString();
                                     _currencyRate = curr.currencyRate ?? 0.0;
                                   });

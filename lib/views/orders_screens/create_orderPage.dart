@@ -47,16 +47,8 @@ class _CreateOrderState extends State<CreateOrder> {
   }
 
   void calculateEqualOrderAmount() {
-    switch (currencyNameMenu?.toLowerCase()) {
-      case "shekel":
-        _currencyRate;
-        break;
-      case "dollar":
-        _currencyRate;
-        break;
-      case "euro":
-        _currencyRate;
-        break;
+    if (currencyNameMenu?.toLowerCase() != null) {
+      _currencyRate = _currencyRate;
     }
 
     double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
@@ -223,9 +215,7 @@ class _CreateOrderState extends State<CreateOrder> {
                           },
                         ),
                       ),
-                      const SizedBox(
-                          width:
-                              16), // Add some space between the text form fields
+                      const SizedBox(width: 16),
                       Expanded(
                         child: TextFormField(
                           enabled: false,

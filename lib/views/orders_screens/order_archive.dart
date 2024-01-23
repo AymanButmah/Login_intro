@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intro_project/models/order.dart';
+import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/providers/switch_status.dart';
 import 'package:intro_project/sql/sqlite.dart';
@@ -25,24 +26,12 @@ class _OrderArchiveState extends State<OrderArchive> {
   RxList get filteredOrderData => Get.find<DatabaseHelper>().filteredOrderData;
   List get orderData => Get.find<DatabaseHelper>().orderData;
 
-  RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
-  List get userData => Get.find<DatabaseHelper>().userData;
+  RxList<User> get filteredUserData =>
+      Get.find<DatabaseHelper>().filteredUserData;
+  List<User> get userData => Get.find<DatabaseHelper>().userData;
 
   final SwitchController sswitchController =
       Get.put(SwitchController(), permanent: true);
-
-  // String? _selectedUser;
-  // final inputKey = TextEditingController();
-  String? _selectedAnimal;
-
-  // final List<String> _suggestions = [
-  //   'Alligator',
-  //   'Buffalo',
-  //   'Chicken',
-  //   'Dog',
-  //   'Eagle',
-  //   'Frog'
-  // ];
 
   @override
   void initState() {
@@ -101,14 +90,17 @@ class _OrderArchiveState extends State<OrderArchive> {
     return Scaffold(
       drawer: const navDrawer(),
       appBar: AppBar(
-        title: const SizedBox(
+        title: SizedBox(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "Order List",
                 style: TextStyle(color: Colors.blue),
               ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.1,
+              )
             ],
           ),
         ),
@@ -127,37 +119,25 @@ class _OrderArchiveState extends State<OrderArchive> {
             decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(.2),
                 borderRadius: BorderRadius.circular(8)),
-            // child: Autocomplete<String>(
-            //   optionsBuilder: (TextEditingValue value) {
-            //     // When the field is empty
-            //     if (value.text.isEmpty) {
-            //       return [];
-            //     }
-
-            //     return (filteredUserData.value).where((user) =>
-            //         user.toLowerCase().contains(value.text.toLowerCase()));
-            //   },
-            //   onSelected: (value) {
-            //     setState(() {
-            //       _selectedAnimal = value;
-            //     });
-            //   },
-            // ),
-
-            // TextFormField(
-            //   controller: inputKey,
-            //   onChanged: (value) {
-            //     if (value.isNotEmpty) {
-            //       searchOrder();
-            //     } else {
-            //       filteredOrderData.value = orderData;
-            //     }
-            //   },
-            //   decoration: const InputDecoration(
-            //       border: InputBorder.none,
-            //       icon: Icon(Icons.search),
-            //       hintText: "Search"),
-            // ),
+            child: Autocomplete<User>(
+              optionsBuilder: (TextEditingValue value) {
+                if (value.text.isEmpty) {
+                  return [];
+                }
+                return filteredUserData.value
+                    .where((user) => user.userName!
+                        .toLowerCase()
+                        .contains(value.text.toLowerCase()))
+                    .toList();
+              },
+              onSelected: (value) {
+                Get.find<DatabaseHelper>()
+                    .getAllOrdersByUser(value.userId)
+                    .then((value) {
+                  filteredOrderData.value = value;
+                });
+              },
+            ),
           ),
           Expanded(
             child: Obx(
@@ -200,8 +180,8 @@ class _OrderArchiveState extends State<OrderArchive> {
                                     "Order ID: ${order.orderId?.toString() ?? ""} ~ Order Amount: ${order.orderAmount?.toString() ?? ""}",
                                     style: const TextStyle(color: Colors.blue),
                                   ),
-                                  subtitle:
-                                      Text("User ID: ${order.userId ?? ""} "),
+                                  subtitle: Text(
+                                      "Name: ${userData.where((element) => element.userId == order.userId).first.userName ?? ""} "),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.delete),
                                     color: Colors.red,

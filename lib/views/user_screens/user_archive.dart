@@ -60,14 +60,17 @@ class _UserArchiveState extends State<UserArchive> {
     return Scaffold(
       drawer: const navDrawer(),
       appBar: AppBar(
-        title: const SizedBox(
+        title: SizedBox(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "User List",
                 style: TextStyle(color: Colors.blue),
               ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.1,
+              )
             ],
           ),
         ),

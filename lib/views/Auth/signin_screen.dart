@@ -41,7 +41,6 @@ class _SignInScreenState extends State<SignInScreen> {
       ));
 
       if (response == true) {
-        // if check setremmber me becomes true then session true
         Provider.of<SessionProvider>(context, listen: false).setRememberMe();
 
         Get.offAll(() => const UserArchive());
