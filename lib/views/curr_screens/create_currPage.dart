@@ -33,7 +33,7 @@ class _CreateCurrencyState extends State<CreateCurrency> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Create Currency ~ \$ ₪ €",
+          "Create Currency",
           style: TextStyle(color: Colors.blue),
         ),
       ),
@@ -53,8 +53,8 @@ class _CreateCurrencyState extends State<CreateCurrency> {
                   return null;
                 },
                 decoration: const InputDecoration(
-                  labelText: "Currency Name",
-                ),
+                    labelText: "Currency Name",
+                    hintText: "Dollar , Shekel , Euro"),
                 onEditingComplete: () {
                   FocusScope.of(context).nextFocus();
                 },
@@ -69,8 +69,7 @@ class _CreateCurrencyState extends State<CreateCurrency> {
                   return null;
                 },
                 decoration: const InputDecoration(
-                  labelText: "Currency Symbol",
-                ),
+                    labelText: "Currency Symbol", hintText: "JOD \$ ₪ €"),
                 onEditingComplete: () {
                   FocusScope.of(context).nextFocus();
                 },

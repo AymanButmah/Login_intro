@@ -4,10 +4,10 @@ import 'package:get/get.dart';
 
 class SwitchController extends GetxController {
   RxBool _status = false.obs;
-  RxBool get status => _status;
 
   void changeStatus(bool newStatus) {
-    status.value = newStatus;
+    _status.value = newStatus;
+    update();
     print("Status changed to: $newStatus");
   }
 }

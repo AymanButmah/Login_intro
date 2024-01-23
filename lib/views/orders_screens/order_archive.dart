@@ -28,7 +28,8 @@ class _OrderArchiveState extends State<OrderArchive> {
   RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
   List get userData => Get.find<DatabaseHelper>().userData;
 
-  final SwitchController _switchController = Get.put(SwitchController());
+  final SwitchController sswitchController =
+      Get.put(SwitchController(), permanent: true);
 
   // String? _selectedUser;
   // final inputKey = TextEditingController();
@@ -114,7 +115,7 @@ class _OrderArchiveState extends State<OrderArchive> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(() => const CreateOrder());
+          Get.to(() => CreateOrder());
         },
         child: const Icon(Icons.add),
       ),
@@ -180,19 +181,20 @@ class _OrderArchiveState extends State<OrderArchive> {
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: ListTile(
-                                  leading: Switch(
-                                    value: order.status ?? false,
-                                    onChanged: (newStatus) {
-                                      setState(() {
+                                  leading: GetBuilder<SwitchController>(
+                                    init: SwitchController(),
+                                    builder: (switchController) => Switch(
+                                      value: order.status,
+                                      onChanged: (newStatus) {
+                                        sswitchController
+                                            .changeStatus(newStatus);
                                         order.status = newStatus;
-
-                                        // SwitchController()
-                                        //     .changeStatus(newStatus);
-                                      });
-                                      order.status = newStatus;
-                                      print(
-                                          "Order status changed to: $newStatus");
-                                    },
+                                        db.updateStatusOrder(
+                                            newStatus, order.orderId);
+                                        print(
+                                            "Order status changed to: $newStatus");
+                                      },
+                                    ),
                                   ),
                                   title: Text(
                                     "Order ID: ${order.orderId?.toString() ?? ""} ~ Order Amount: ${order.orderAmount?.toString() ?? ""}",

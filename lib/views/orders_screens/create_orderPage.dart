@@ -11,7 +11,7 @@ import 'package:intro_project/sql/sqlite.dart';
 import '../../models/order.dart';
 
 class CreateOrder extends StatefulWidget {
-  const CreateOrder({Key? key}) : super(key: key);
+  CreateOrder({Key? key}) : super(key: key);
 
   @override
   State<CreateOrder> createState() => _CreateOrderState();
@@ -26,7 +26,7 @@ class _CreateOrderState extends State<CreateOrder> {
   String? _userId;
   String? _userName;
   String? _currencyId;
-  String? _currencyName;
+  String? currencyNameMenu;
   final formKey = GlobalKey<FormState>();
   final db = Get.find<DatabaseHelper>();
   RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
@@ -47,7 +47,7 @@ class _CreateOrderState extends State<CreateOrder> {
   }
 
   void calculateEqualOrderAmount() {
-    switch (_currencyName) {
+    switch (currencyNameMenu?.toLowerCase()) {
       case "shekel":
         _currencyRate;
         break;
@@ -150,7 +150,7 @@ class _CreateOrderState extends State<CreateOrder> {
                                     ? filteredCurrencyData.value[0].currencyId
                                         .toString()
                                     : ""),
-                            hint: Text(_currencyName ?? "Choose Curr"),
+                            hint: Text(currencyNameMenu ?? "Choose Curr"),
                             onChanged: (String? value) {
                               setState(() {
                                 _currencyId = value ?? "";
@@ -170,7 +170,7 @@ class _CreateOrderState extends State<CreateOrder> {
                                       return DropdownMenuItem<String>(
                                         onTap: () {
                                           setState(() {
-                                            _currencyName =
+                                            currencyNameMenu =
                                                 item.currencyName.toString();
                                             _currencyRate =
                                                 item.currencyRate ?? 0.0;

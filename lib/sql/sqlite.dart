@@ -176,6 +176,18 @@ class DatabaseHelper {
     return result;
   }
 
+  Future<int> updateStatusOrder(status, orderId) async {
+    var result = await db!.rawUpdate(
+      'update orders set status = ? WHERE orderId = ?',
+      [
+        status,
+        orderId,
+      ],
+    );
+    getOrders();
+    return result;
+  }
+
   //Delete Order
   Future<int> deleteOrder(int orderId) async {
     var result =
