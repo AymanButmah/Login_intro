@@ -144,13 +144,7 @@ class _CreateOrderState extends State<CreateOrder> {
                       ),
                       Expanded(
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: _currencyId ??
-                                (filteredCurrencyData.value.isNotEmpty
-                                    ? filteredCurrencyData.value[0].currencyId
-                                        .toString()
-                                    : ""),
-                            hint: Text(currencyNameMenu ?? "Choose Curr"),
+                          child: DropdownButtonFormField<String>(
                             onChanged: (String? value) {
                               setState(() {
                                 _currencyId = value ?? "";
@@ -171,7 +165,7 @@ class _CreateOrderState extends State<CreateOrder> {
                                         onTap: () {
                                           setState(() {
                                             currencyNameMenu =
-                                                item.currencyName.toString();
+                                                item.currencyId.toString();
                                             _currencyRate =
                                                 item.currencyRate ?? 0.0;
                                           });
@@ -187,6 +181,12 @@ class _CreateOrderState extends State<CreateOrder> {
                                       );
                                     }
                                   }).toList(),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "CurrencyType Selection is required";
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ),
@@ -268,7 +268,7 @@ class _CreateOrderState extends State<CreateOrder> {
                         ),
                       ),
                       Expanded(
-                        child: DropdownButton<String>(
+                        child: DropdownButtonFormField<String>(
                           hint: Text(status.text),
                           onChanged: (String? value) {
                             setState(() {
@@ -282,6 +282,12 @@ class _CreateOrderState extends State<CreateOrder> {
                               child: Text(value),
                             );
                           }).toList(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Status Selection is required";
+                            }
+                            return null;
+                          },
                         ),
                       ),
                     ],
@@ -306,7 +312,7 @@ class _CreateOrderState extends State<CreateOrder> {
                         ),
                       ),
                       Expanded(
-                        child: DropdownButton<String>(
+                        child: DropdownButtonFormField<String>(
                           hint: Text(orderType.text),
                           onChanged: (String? value) {
                             setState(() {
@@ -324,6 +330,12 @@ class _CreateOrderState extends State<CreateOrder> {
                               child: Text(value),
                             );
                           }).toList(),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Order Type Selection is required";
+                            }
+                            return null;
+                          },
                         ),
                       ),
                     ],
@@ -349,7 +361,7 @@ class _CreateOrderState extends State<CreateOrder> {
                       ),
                       Expanded(
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
+                          child: DropdownButtonFormField<String>(
                             hint: Text(_userName ?? "Choose User"),
                             onChanged: (String? value) {
                               setState(() {
@@ -368,6 +380,12 @@ class _CreateOrderState extends State<CreateOrder> {
                                 child: Text(user.userName.toString()),
                               );
                             }).toList(),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "User Selection is required";
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ),
