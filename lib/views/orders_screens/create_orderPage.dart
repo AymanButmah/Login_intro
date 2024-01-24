@@ -29,9 +29,9 @@ class _CreateOrderState extends State<CreateOrder> {
   String? currencyNameMenu;
   final formKey = GlobalKey<FormState>();
   final db = Get.find<DatabaseHelper>();
-  RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
   RxList get filteredCurrencyData =>
       Get.find<DatabaseHelper>().filteredCurrencyData;
+  RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
   List<User> get userData => Get.find<DatabaseHelper>().userData;
   List<Currency> get currencyData => Get.find<DatabaseHelper>().currencyData;
 
@@ -40,18 +40,20 @@ class _CreateOrderState extends State<CreateOrder> {
   @override
   void initState() {
     super.initState();
-
+    chadMethod();
     orderAmount.addListener(() {
       calculateEqualOrderAmount();
     });
   }
 
   void calculateEqualOrderAmount() {
-    if (currencyNameMenu?.toLowerCase() != null) {
-      _currencyRate = _currencyRate;
+    double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
+
+    if (currencyNameMenu == null) {
+      // Default currency rate when currency is not selected
+      _currencyRate = 1.0;
     }
 
-    double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
     double calculatedEqualOrderAmount = orderAmountValue / _currencyRate;
     equalOrderAmount.text = calculatedEqualOrderAmount.toStringAsFixed(2);
   }
@@ -63,6 +65,12 @@ class _CreateOrderState extends State<CreateOrder> {
     equalOrderAmount.dispose();
     status.dispose();
     super.dispose();
+  }
+
+  chadMethod() async {
+    await Get.find<DatabaseHelper>().init();
+    await Get.find<DatabaseHelper>().getCurrencies();
+    filteredCurrencyData.value = currencyData;
   }
 
   @override

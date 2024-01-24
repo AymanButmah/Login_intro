@@ -21,6 +21,6 @@ class User {
 
   @override
   String toString() {
-    return userName!;
+    return userName ?? "";
   }
 }

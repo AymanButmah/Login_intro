@@ -24,23 +24,29 @@ class _EditOrderState extends State<EditOrder> {
   final status = TextEditingController();
   final orderType = TextEditingController();
   String? _userId;
-  String? _currencyId;
-  String? _userName;
+  int? _currencyId;
   String? currencyNameMenu;
   final formKey = GlobalKey<FormState>();
   final db = Get.find<DatabaseHelper>();
 
   RxList get filteredUserData => Get.find<DatabaseHelper>().filteredUserData;
-  RxList get filteredCurrencyData =>
+  RxList<Currency> get filteredCurrencyData =>
       Get.find<DatabaseHelper>().filteredCurrencyData;
   List<User> get userData => Get.find<DatabaseHelper>().userData;
   List<Currency> get currencyData => Get.find<DatabaseHelper>().currencyData;
+
+  RxList get filteredOrderData => Get.find<DatabaseHelper>().filteredOrderData;
+  List get orderData => Get.find<DatabaseHelper>().orderData;
 
   double _currencyRate = Currency().currencyRate ?? 0.0;
 
   void calculateEqualOrderAmount() {
     if (currencyNameMenu?.toLowerCase() != null) {
       _currencyRate = _currencyRate;
+    }
+
+    if (currencyNameMenu == null) {
+      _currencyRate = 1.0;
     }
 
     double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
@@ -50,6 +56,8 @@ class _EditOrderState extends State<EditOrder> {
 
   @override
   void initState() {
+    chadMethod();
+
     orderDate.text =
         widget.order.orderDate == "null" ? "" : widget.order.orderDate ?? "";
     orderAmount.text = widget.order.orderAmount == null
@@ -64,15 +72,19 @@ class _EditOrderState extends State<EditOrder> {
         widget.order.orderType == "null" ? "" : widget.order.orderType ?? "";
     _userId =
         widget.order.userId == null ? "0" : widget.order.userId.toString();
-    _currencyId = widget.order.currencyId == null
-        ? "0"
-        : widget.order.currencyId.toString();
+    _currencyId = widget.order.currencyId;
 
     orderAmount.addListener(() {
       calculateEqualOrderAmount();
     });
 
     super.initState();
+  }
+
+  chadMethod() async {
+    await Get.find<DatabaseHelper>().init();
+    await Get.find<DatabaseHelper>().getCurrencies();
+    filteredCurrencyData.value = currencyData;
   }
 
   @override
@@ -174,17 +186,16 @@ class _EditOrderState extends State<EditOrder> {
                       ),
                       Expanded(
                         child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            hint: Text(currencyNameMenu ?? "Choose Curr"),
-                            onChanged: (String? value) {
+                          child: DropdownButton<int>(
+                            value: _currencyId,
+                            onChanged: (int? value) {
                               setState(() {
-                                _currencyId = value ?? "";
+                                _currencyId = value;
                               });
                             },
-                            items:
-                                (filteredCurrencyData.value as List<Currency>)
-                                    .map((Currency curr) {
-                              return DropdownMenuItem<String>(
+                            items: (filteredCurrencyData.value)
+                                .map((Currency curr) {
+                              return DropdownMenuItem<int>(
                                 onTap: () {
                                   setState(() {
                                     currencyNameMenu =
@@ -192,7 +203,8 @@ class _EditOrderState extends State<EditOrder> {
                                     _currencyRate = curr.currencyRate ?? 0.0;
                                   });
                                 },
-                                value: curr.currencyId.toString(),
+                                value: curr
+                                    .currencyId, // هون الفاليو الي بترجع لازم currenvyid
                                 child: Text(curr.currencyName.toString()),
                               );
                             }).toList(),
@@ -351,7 +363,7 @@ class _EditOrderState extends State<EditOrder> {
                       Expanded(
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
-                            hint: Text(_userName ?? "Choose User"),
+                            value: _userId,
                             onChanged: (String? value) {
                               setState(() {
                                 _userId = value ?? "";
@@ -361,9 +373,7 @@ class _EditOrderState extends State<EditOrder> {
                                 .map((User user) {
                               return DropdownMenuItem<String>(
                                 onTap: () {
-                                  setState(() {
-                                    _userName = user.userName.toString();
-                                  });
+                                  setState(() {});
                                 },
                                 value: user.userId.toString(),
                                 child: Text(user.userName.toString()),

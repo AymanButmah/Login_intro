@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intro_project/models/order.dart';
 import 'package:intro_project/models/user.dart';
 import 'package:intro_project/providers/provider.dart';
 import 'package:intro_project/providers/switch_status.dart';
@@ -46,12 +45,6 @@ class _OrderArchiveState extends State<OrderArchive> {
 
     filteredOrderData.value = orderData;
     filteredUserData.value = userData;
-  }
-
-  Future<void> fetchAndSetOrders(int userId) async {
-    List<Order> orders =
-        await Get.find<DatabaseHelper>().getOrdersByUserId(userId);
-    filteredOrderData.value = orders;
   }
 
   void _deleteData(int id) async {

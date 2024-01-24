@@ -25,7 +25,7 @@ class DatabaseHelper {
   RxList filteredOrderData = [].obs;
   List<Order> orderData = [];
 
-  RxList filteredCurrencyData = [].obs;
+  RxList<Currency> filteredCurrencyData = <Currency>[].obs;
   List<Currency> currencyData = [];
 
   Future<Database> initDB() async {
@@ -132,13 +132,6 @@ class DatabaseHelper {
     ''');
     List<Order> orders = allRows.map((order) => Order.fromJson(order)).toList();
     return orders;
-  }
-
-  Future<List<Order>> getOrdersByUserId(int userId) async {
-    final Database db = await initDB();
-    final result =
-        await db.query('orders', where: 'userId = ?', whereArgs: [userId]);
-    return result.map((json) => Order.fromJson(json)).toList();
   }
 
   //Create Order
