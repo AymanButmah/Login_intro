@@ -21,8 +21,8 @@ class _EditOrderState extends State<EditOrder> {
   final orderDate = TextEditingController();
   final orderAmount = TextEditingController();
   final equalOrderAmount = TextEditingController();
-  final status = TextEditingController();
-  final orderType = TextEditingController();
+  bool? status;
+  String? orderType;
   String? _userId;
   int? _currencyId;
   String? currencyNameMenu;
@@ -69,10 +69,8 @@ class _EditOrderState extends State<EditOrder> {
     equalOrderAmount.text = widget.order.equalOrderAmount == null
         ? "0.0"
         : widget.order.equalOrderAmount.toString();
-    status.text =
-        widget.order.status == "null" ? "" : widget.order.status.toString();
-    orderType.text =
-        widget.order.orderType == "null" ? "" : widget.order.orderType ?? "";
+    status = widget.order.status;
+    orderType = widget.order.orderType;
     _userId =
         widget.order.userId == null ? "0" : widget.order.userId.toString();
     _currencyId = widget.order.currencyId;
@@ -99,8 +97,6 @@ class _EditOrderState extends State<EditOrder> {
     orderDate.dispose();
     orderAmount.dispose();
     equalOrderAmount.dispose();
-    status.dispose();
-    orderType.dispose();
     super.dispose();
   }
 
@@ -266,20 +262,23 @@ class _EditOrderState extends State<EditOrder> {
                         ),
                       ),
                       Expanded(
-                        child: DropdownButton<String>(
-                          hint: Text(status.text),
-                          onChanged: (String? value) {
+                        child: DropdownButton<bool>(
+                          value: status,
+                          onChanged: (bool? value) {
                             setState(() {
-                              status.text = value ?? "";
+                              status = value;
                             });
                           },
-                          items: ["Active", "Inactive"]
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
+                          items: const [
+                            DropdownMenuItem<bool>(
+                              value: true,
+                              child: Text("Active"),
+                            ),
+                            DropdownMenuItem<bool>(
+                              value: false,
+                              child: Text("Inactive"),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -305,17 +304,17 @@ class _EditOrderState extends State<EditOrder> {
                       ),
                       Expanded(
                         child: DropdownButton<String>(
-                          hint: Text(orderType.text),
+                          value: orderType,
                           onChanged: (String? value) {
                             setState(() {
-                              orderType.text = value ?? "";
+                              orderType = value ?? "";
                             });
                           },
                           items: [
                             "Sell Order",
                             "Purchase Order",
                             "Return Sell Order",
-                            "Return Purchase Order"
+                            "Return Purchase Order",
                           ].map<DropdownMenuItem<String>>((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
@@ -397,17 +396,9 @@ class _EditOrderState extends State<EditOrder> {
   void _submitForm() {
     if (formKey.currentState!.validate()) {
       db
-          .updateOrder(
-              widget.order.orderId,
-              orderDate.text,
-              orderAmount.text,
-              equalOrderAmount.text,
-              _currencyId,
-              status.text == "Active" ? true : false,
-              orderType.text,
-              _userId)
+          .updateOrder(widget.order.orderId, orderDate.text, orderAmount.text,
+              equalOrderAmount.text, _currencyId, status, orderType, _userId)
           .whenComplete(() {
-        debugPrint(status.text.toString());
         Get.back();
       });
     }
