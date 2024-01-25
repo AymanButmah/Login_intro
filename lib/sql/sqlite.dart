@@ -30,8 +30,10 @@ class DatabaseHelper {
 
   Future<Database> initDB() async {
     if (initialise) {
+      //To Make sure database initialise normally
       return db!;
     }
+    //init database skeletonCode
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, databaseName);
     db = await openDatabase(path, version: 1, onConfigure: _onConfigure,
@@ -43,6 +45,7 @@ class DatabaseHelper {
     return db!;
   }
 
+  // to Activate foreign key in tables
   static Future _onConfigure(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
   }
@@ -73,6 +76,7 @@ class DatabaseHelper {
 
   //check duplicates
   Future<bool> checkUserExist(String username) async {
+    //to prevent the duplicated users scenario
     final Database db = await initDB();
     final List<Map<String, dynamic>> response =
         await db.query("users", where: "userName = ?", whereArgs: [username]);

@@ -1,4 +1,4 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, file_names
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,12 +36,12 @@ class navDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.account_tree_rounded),
             title: const Text('Orders'),
-            onTap: () => {Get.offAll(() => OrderArchive())},
+            onTap: () => {Get.offAll(() => const OrderArchive())},
           ),
           ListTile(
             leading: const Icon(Icons.currency_exchange_rounded),
             title: const Text('Currency'),
-            onTap: () => {Get.offAll(() => CurrencyArchive())},
+            onTap: () => {Get.offAll(() => const CurrencyArchive())},
           ),
           Consumer<SessionProvider>(
             builder: (context, SessionProvider provider, child) => ListTile(

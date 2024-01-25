@@ -46,8 +46,11 @@ class _EditOrderState extends State<EditOrder> {
     }
 
     if (currencyNameMenu == null) {
+      // Default currency rate when currency is not selected
+
       _currencyRate = 1.0;
     }
+    //equalOrderAmount Calculation
 
     double orderAmountValue = double.tryParse(orderAmount.text) ?? 0.0;
     double calculatedEqualOrderAmount = orderAmountValue / _currencyRate;
@@ -57,7 +60,7 @@ class _EditOrderState extends State<EditOrder> {
   @override
   void initState() {
     chadMethod();
-
+    //setting the values got from database .. no place for nulls
     orderDate.text =
         widget.order.orderDate == "null" ? "" : widget.order.orderDate ?? "";
     orderAmount.text = widget.order.orderAmount == null
@@ -75,6 +78,8 @@ class _EditOrderState extends State<EditOrder> {
     _currencyId = widget.order.currencyId;
 
     orderAmount.addListener(() {
+      //listener to listen to valeus inserted to orderamount and selected currency
+
       calculateEqualOrderAmount();
     });
 
@@ -82,6 +87,8 @@ class _EditOrderState extends State<EditOrder> {
   }
 
   chadMethod() async {
+    //getting data from database
+
     await Get.find<DatabaseHelper>().init();
     await Get.find<DatabaseHelper>().getCurrencies();
     filteredCurrencyData.value = currencyData;
@@ -102,27 +109,6 @@ class _EditOrderState extends State<EditOrder> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Order", style: TextStyle(color: Colors.blue)),
-        actions: [
-          IconButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  db
-                      .updateOrder(
-                          widget.order.orderId,
-                          orderDate.text,
-                          orderAmount.text,
-                          equalOrderAmount.text,
-                          _currencyId,
-                          status.text,
-                          orderType.text,
-                          _userId)
-                      .whenComplete(() {
-                    Get.back();
-                  });
-                }
-              },
-              icon: const Icon(Icons.check))
-        ],
       ),
       body: Form(
         key: formKey,
@@ -203,8 +189,7 @@ class _EditOrderState extends State<EditOrder> {
                                     _currencyRate = curr.currencyRate ?? 0.0;
                                   });
                                 },
-                                value: curr
-                                    .currencyId, // هون الفاليو الي بترجع لازم currenvyid
+                                value: curr.currencyId,
                                 child: Text(curr.currencyName.toString()),
                               );
                             }).toList(),
@@ -418,10 +403,11 @@ class _EditOrderState extends State<EditOrder> {
               orderAmount.text,
               equalOrderAmount.text,
               _currencyId,
-              status.text,
+              status.text == "Active" ? true : false,
               orderType.text,
               _userId)
           .whenComplete(() {
+        debugPrint(status.text.toString());
         Get.back();
       });
     }

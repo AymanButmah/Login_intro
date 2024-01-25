@@ -79,6 +79,7 @@ class _CreateCurrencyState extends State<CreateCurrency> {
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
+                  //regular expression (RegExp) that defines the allowed input pattern
                   FilteringTextInputFormatter.allow(
                     RegExp(r'^\d+\.?\d{0,2}$'),
                   ),
@@ -122,7 +123,7 @@ class _CreateCurrencyState extends State<CreateCurrency> {
   void _submitForm() {
     if (formKey.currentState!.validate()) {
       double rateValue = double.parse(currencyRate.text);
-
+      //validation then insert to database
       db
           .createCurrency(Currency(
         currencyName: currencyName.text,

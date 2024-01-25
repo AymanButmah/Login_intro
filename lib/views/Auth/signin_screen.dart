@@ -41,11 +41,14 @@ class _SignInScreenState extends State<SignInScreen> {
       ));
 
       if (response == true) {
+        //if the response return true and check all cases.. the system store login credentials in
+        //shared Preferances
         Provider.of<SessionProvider>(context, listen: false).setRememberMe();
 
         Get.offAll(() => const UserArchive());
       } else {
         setState(() {
+          //case if the credentials is not matched in database
           isLoginTrue = true;
         });
       }

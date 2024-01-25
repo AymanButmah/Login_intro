@@ -11,7 +11,7 @@ import 'package:intro_project/sql/sqlite.dart';
 import '../../models/order.dart';
 
 class CreateOrder extends StatefulWidget {
-  CreateOrder({Key? key}) : super(key: key);
+  const CreateOrder({Key? key}) : super(key: key);
 
   @override
   State<CreateOrder> createState() => _CreateOrderState();
@@ -41,6 +41,7 @@ class _CreateOrderState extends State<CreateOrder> {
   void initState() {
     super.initState();
     chadMethod();
+    //listener to listen to valeus inserted to orderamount and selected currency
     orderAmount.addListener(() {
       calculateEqualOrderAmount();
     });
@@ -53,7 +54,7 @@ class _CreateOrderState extends State<CreateOrder> {
       // Default currency rate when currency is not selected
       _currencyRate = 1.0;
     }
-
+    //equalOrderAmount Calculation
     double calculatedEqualOrderAmount = orderAmountValue / _currencyRate;
     equalOrderAmount.text = calculatedEqualOrderAmount.toStringAsFixed(2);
   }
@@ -68,6 +69,7 @@ class _CreateOrderState extends State<CreateOrder> {
   }
 
   chadMethod() async {
+    //getting data from database
     await Get.find<DatabaseHelper>().init();
     await Get.find<DatabaseHelper>().getCurrencies();
     filteredCurrencyData.value = currencyData;
@@ -149,7 +151,7 @@ class _CreateOrderState extends State<CreateOrder> {
                               onChanged: (String? value) {
                                 setState(() {
                                   _currencyId = value ?? "";
-                                  print(_currencyRate);
+                                  debugPrint(_currencyRate.toString());
                                 });
                               },
                               items: (filteredCurrencyData.value).isEmpty
@@ -420,18 +422,19 @@ class _CreateOrderState extends State<CreateOrder> {
 
   void _submitForm() {
     if (formKey.currentState!.validate()) {
+      //converting  both valeus to make the database accept the values
       double orderAmountValue = double.parse(orderAmount.text);
       double equalorderAmountValue = double.parse(equalOrderAmount.text);
       db
           .createOrder(Order(
-        orderDate: orderDate.text,
-        orderAmount: orderAmountValue,
-        equalOrderAmount: equalorderAmountValue,
-        currencyId: int.parse(_currencyId ?? "0"),
-        status: status.text == "Active" ? true : false,
-        orderType: orderType.text,
-        userId: int.parse(_userId ?? "0"),
-      ))
+              orderDate: orderDate.text,
+              orderAmount: orderAmountValue,
+              equalOrderAmount: equalorderAmountValue,
+              currencyId: int.parse(_currencyId ?? "0"), // prevent Nulls
+              status: status.text == "Active" ? true : false,
+              orderType: orderType.text,
+              userId: int.parse(_userId ?? "0") // prevent Nulls,
+              ))
           .whenComplete(() {
         Get.back();
       });

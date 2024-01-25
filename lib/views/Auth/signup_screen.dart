@@ -32,13 +32,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   signUp() async {
     final db = Get.find<DatabaseHelper>();
-
+    //Check if user Exists
+    //if its exists show red text says duplicated
     bool userExist = await db.checkUserExist(username.text);
     if (userExist) {
       setState(() {
         isUserExists = true;
       });
     } else {
+      //insertUser to database
       db
           .signup(User(userName: username.text, userPassword: password.text))
           .whenComplete(() {

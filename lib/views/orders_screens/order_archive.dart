@@ -39,6 +39,7 @@ class _OrderArchiveState extends State<OrderArchive> {
   }
 
   chadMethod() async {
+    //get the data from database
     await Get.find<DatabaseHelper>().init();
     await Get.find<DatabaseHelper>().getOrders();
     await Get.find<DatabaseHelper>().getUsers();
@@ -48,6 +49,8 @@ class _OrderArchiveState extends State<OrderArchive> {
   }
 
   void _deleteData(int id) async {
+    //Getx Library widget to make delete animation
+    // delete Order through registerd ID
     await Get.find<DatabaseHelper>().deleteOrder(id);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -100,7 +103,7 @@ class _OrderArchiveState extends State<OrderArchive> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(() => CreateOrder());
+          Get.to(() => const CreateOrder());
         },
         child: const Icon(Icons.add),
       ),
@@ -117,6 +120,7 @@ class _OrderArchiveState extends State<OrderArchive> {
                 if (value.text.isEmpty) {
                   return [];
                 }
+                //get userData from users
                 return filteredUserData.value
                     .where((user) => user.userName!
                         .toLowerCase()
@@ -124,6 +128,7 @@ class _OrderArchiveState extends State<OrderArchive> {
                     .toList();
               },
               onSelected: (value) {
+                //when orderId table foregin key userId equal to user table key userId
                 Get.find<DatabaseHelper>()
                     .getAllOrdersByUser(value.userId)
                     .then((value) {
@@ -164,7 +169,7 @@ class _OrderArchiveState extends State<OrderArchive> {
                                         order.status = newStatus;
                                         db.updateStatusOrder(
                                             newStatus, order.orderId);
-                                        print(
+                                        debugPrint(
                                             "Order status changed to: $newStatus");
                                       },
                                     ),

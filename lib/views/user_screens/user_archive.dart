@@ -93,7 +93,7 @@ class _UserArchiveState extends State<UserArchive> {
               controller: inputKey,
               onChanged: (value) {
                 if (value.isNotEmpty) {
-                  print("Search");
+                  debugPrint("Search");
                   searchUser();
                 } else {
                   filteredData.value = userData;

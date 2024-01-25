@@ -23,6 +23,7 @@ class _EditCurrencyState extends State<EditCurrency> {
 
   @override
   void initState() {
+    // Preventing system from accepting null values
     currencyName.text = widget.currency.currencyName == "null"
         ? ""
         : widget.currency.currencyName ?? "";
@@ -51,24 +52,6 @@ class _EditCurrencyState extends State<EditCurrency> {
       appBar: AppBar(
         title: const Text("Edit Currency ~ \$ ₪ €",
             style: TextStyle(color: Colors.blue)),
-        actions: [
-          IconButton(
-              onPressed: () {
-                if (formKey.currentState!.validate()) {
-                  db
-                      .updateCurrency(
-                    widget.currency.currencyId,
-                    currencyName.text,
-                    currencySymbol.text,
-                    currencyRate.text,
-                  )
-                      .whenComplete(() {
-                    Get.back();
-                  });
-                }
-              },
-              icon: const Icon(Icons.check))
-        ],
       ),
       body: Form(
           key: formKey,

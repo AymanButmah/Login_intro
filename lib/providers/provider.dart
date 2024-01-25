@@ -3,6 +3,7 @@ import 'package:intro_project/views/Auth/signin_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionProvider extends ChangeNotifier {
+  //the Provider Resposable for Signin/Shared Pref/logout/Credentials
   bool _isChecked = false;
   bool get isChecked => _isChecked;
 

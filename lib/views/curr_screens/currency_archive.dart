@@ -33,12 +33,15 @@ class _CurrencyArchiveState extends State<CurrencyArchive> {
   }
 
   chadMethod() async {
+    //Get data from Database through list
     await Get.find<DatabaseHelper>().init();
     await Get.find<DatabaseHelper>().getCurrencies();
     filteredCurrencyData.value = CurrencyData;
   }
 
   void _deleteData(int id) async {
+    //Getx Library widget to make delete animation
+    // delete Currency through registerd ID
     await Get.find<DatabaseHelper>().deleteCurrency(id);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -50,6 +53,7 @@ class _CurrencyArchiveState extends State<CurrencyArchive> {
 
   //filter
   void searchCurrency() {
+    //search through currency name in database (inputkey)
     filteredCurrencyData.value = CurrencyData.where((currency) => currency
         .currencyName!
         .toLowerCase()
@@ -57,6 +61,7 @@ class _CurrencyArchiveState extends State<CurrencyArchive> {
   }
 
   Widget buildCurrencyIcon(int index) {
+    //the default currencies not linked with differenct Icon
     String currencySymbol =
         filteredCurrencyData.value[index].currencySymbol ?? "";
 
@@ -113,6 +118,7 @@ class _CurrencyArchiveState extends State<CurrencyArchive> {
                 if (value.isNotEmpty) {
                   searchCurrency();
                 } else {
+                  //bring back the list if the field is empty
                   filteredCurrencyData.value = CurrencyData;
                 }
               },
