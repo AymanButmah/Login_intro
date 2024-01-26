@@ -183,6 +183,7 @@ class _EditOrderState extends State<EditOrder> {
                                     currencyNameMenu =
                                         curr.currencyName.toString();
                                     _currencyRate = curr.currencyRate ?? 0.0;
+                                    calculateEqualOrderAmount();
                                   });
                                 },
                                 value: curr.currencyId,

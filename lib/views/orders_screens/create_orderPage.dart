@@ -54,7 +54,7 @@ class _CreateOrderState extends State<CreateOrder> {
       // Default currency rate when currency is not selected
       _currencyRate = 1.0;
     }
-    //equalOrderAmount Calculation
+    // equalOrderAmount Calculation
     double calculatedEqualOrderAmount = orderAmountValue / _currencyRate;
     equalOrderAmount.text = calculatedEqualOrderAmount.toStringAsFixed(2);
   }
@@ -171,6 +171,7 @@ class _CreateOrderState extends State<CreateOrder> {
                                                   item.currencyId.toString();
                                               _currencyRate =
                                                   item.currencyRate ?? 0.0;
+                                              calculateEqualOrderAmount(); // Listen to changes here
                                             });
                                           },
                                           value: item.currencyId.toString(),
